@@ -169,7 +169,7 @@ public class WorldController extends InputAdapter
 			cameraHelper.setPosition(0, 0);
 		}
 
-		//camera controls (zoom)
+		//camera controls   (zoom)
 		float camZoomSpeed = 1* deltaTime;
 		float camZoomSpeedAccelerationFactor = 5;
 
