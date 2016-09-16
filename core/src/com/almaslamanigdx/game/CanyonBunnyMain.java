@@ -3,7 +3,9 @@ package com.almaslamanigdx.game;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.almaslamanigdx.game.Assets;
 
 public class CanyonBunnyMain implements ApplicationListener 
 {
@@ -21,12 +23,17 @@ public class CanyonBunnyMain implements ApplicationListener
 		//set libGdx log level to DEBUG
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
+		// Load assets
+		Assets.instance.init(new AssetManager());
+		
 		//Initialize controller and rendered
 		worldController = new WorldController();
 		worldRenderer = new WorldRenderer(worldController);
 
 		//Game world is active on start
 		paused = false;
+		
+	
 	}
 
 	@Override
@@ -68,6 +75,7 @@ public class CanyonBunnyMain implements ApplicationListener
 	public void dispose() 
 	{
 		worldRenderer.dispose();
+		Assets.instance.dispose();
 	}
 
 }
