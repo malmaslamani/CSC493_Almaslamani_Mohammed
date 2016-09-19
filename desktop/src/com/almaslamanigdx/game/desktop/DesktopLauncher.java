@@ -15,17 +15,18 @@ public class DesktopLauncher
 	
 	public static void main (String[] arg) 
 	{
-		if (rebuildAtlas) {
+		if (rebuildAtlas) 
+		{
 			Settings settings = new Settings();
 			settings.maxWidth = 1024;
 			settings.maxHeight = 1024;
 			settings.duplicatePadding = false;
 			settings.debug = drawDebugOutline;
-			TexturePacker.process(settings, "assets-raw/images", "../core/assets/images","canyonbunny.pack");
+			TexturePacker.process(settings, "assets-raw/images", "../core/assets/images","monkeyLula.pack");
 			}
 		
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
-		cfg.title = "CanyonBunny";
+		cfg.title = "TheMonkeyGame";
 		cfg.width = 800;
 		cfg.height = 480;
 		new LwjglApplication(new CanyonBunnyMain(), cfg);

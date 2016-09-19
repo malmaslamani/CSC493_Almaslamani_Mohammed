@@ -18,12 +18,17 @@ public class Assets implements Disposable, AssetErrorListener
 	public static final String TAG = Assets.class.getName();
 	public static final Assets instance = new Assets();
 	private AssetManager assetManager;
-	
-	public AssetBunny bunny;
-	public AssetRock rock;
-	public AssetGoldCoin goldCoin;
-	public AssetFeather feather;
+
+	//	public AssetBunny bunny;
+	//	public AssetRock rock;
+	//	public AssetGoldCoin goldCoin;
+	//	public AssetFeather feather;
 	public AssetLevelDecoration levelDecoration;
+	public AssetMonkey monkey;
+	public AssetBanana banana;
+	public AssetPineApple pineApple;
+	public AssetRock rock;
+
 
 	//Singleton: prevent instantiation from other classes 
 	private Assets()
@@ -63,11 +68,15 @@ public class Assets implements Disposable, AssetErrorListener
 		}
 
 		// create game resource objects
-		bunny = new AssetBunny(atlas);
-		rock = new AssetRock(atlas);
-		goldCoin = new AssetGoldCoin(atlas);
-		feather = new AssetFeather(atlas);
+		//		bunny = new AssetBunny(atlas);
+		//		rock = new AssetRock(atlas);
+		//		goldCoin = new AssetGoldCoin(atlas);
+		//		feather = new AssetFeather(atlas);
 		levelDecoration = new AssetLevelDecoration(atlas);
+		monkey = new AssetMonkey(atlas);
+		banana = new AssetBanana(atlas);
+		pineApple = new AssetPineApple(atlas);
+
 	}
 
 
@@ -76,18 +85,18 @@ public class Assets implements Disposable, AssetErrorListener
 	{
 		assetManager.dispose();
 	}
-	
+
 	@Override
 	public void error(AssetDescriptor asset, Throwable throwable) 
 	{
 		Gdx.app.error(TAG, "Couldn't load asset '" +asset.fileName + "'", (Exception)throwable);
 	}
 
-	
+
 
 	//The constructor takes a reference of the corresponding
 	//atlas in which it will find the atlas region it wants.
-	public class AssetBunny 
+	/**	public class AssetBunny 
 	{
 		public final AtlasRegion head;
 		public AssetBunny (TextureAtlas atlas) 
@@ -124,6 +133,49 @@ public class Assets implements Disposable, AssetErrorListener
 			feather = atlas.findRegion("item_feather");
 		}
 	}
+	 **/
+	//this class contains monkey asset
+	public class AssetMonkey
+	{
+		public final AtlasRegion monkey;
+		public AssetMonkey (TextureAtlas atlas) 
+		{
+			monkey = atlas.findRegion("monkey");
+		}
+	}
+
+	//this class contains rock assets
+	public class AssetRock 
+	{
+		public final AtlasRegion edge;
+		public final AtlasRegion middle;
+		public AssetRock (TextureAtlas atlas) 
+		{
+			edge = atlas.findRegion("SmallIsland");
+			middle = atlas.findRegion("MediumIsland");
+		}
+	}
+
+	//this class contains banana asset
+	public class AssetBanana
+	{
+		public final AtlasRegion banana;
+		public AssetBanana (TextureAtlas atlas) 
+		{
+			banana = atlas.findRegion("banana");
+		}
+	}
+
+	//this class contains banana asset
+	public class AssetPineApple
+	{
+		public final AtlasRegion pineApple;
+		public AssetPineApple (TextureAtlas atlas) 
+		{
+			pineApple = atlas.findRegion("pineApple");
+		}
+	}
+
 
 	//this class contains all the
 	//decorative images that only add to the look and feel of the level
