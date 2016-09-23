@@ -110,24 +110,24 @@ public class Level
 						rocks.get(rocks.size - 1).increaseLength(1);
 					}
 				}
-				
-				
+
+
 				// player spawn point
 				else if
 				(BLOCK_TYPE.PLAYER_SPAWNPOINT.sameColor(currentPixel)) 
 				{
 				}
-			
+
 				// feather
 				else if (BLOCK_TYPE.ITEM_FEATHER.sameColor(currentPixel)) 
 				{
 				}
-				
+
 				// gold coin
 				else if (BLOCK_TYPE.ITEM_GOLD_COIN.sameColor(currentPixel)) 
 				{
 				}
-				
+
 				// unknown object/pixel color
 				else 
 				{
@@ -141,7 +141,7 @@ public class Level
 				lastPixel = currentPixel;
 			}
 		}
-		
+
 		// decoration
 		clouds = new Clouds(pixmap.getWidth());
 		clouds.position.set(0, 2);
@@ -149,11 +149,11 @@ public class Level
 		mountains.position.set(-1, -1);
 		waterOverlay = new WaterOverlay(pixmap.getWidth());
 		waterOverlay.position.set(0, -3.75f);
-		
+
 		// free memory
 		pixmap.dispose();
 		Gdx.app.debug(TAG, "level '" + filename + "' loaded");
-		
+
 	}
 
 	//it must be in order to avoid something being behind another
@@ -161,14 +161,16 @@ public class Level
 	{
 		// Draw Mountains
 		mountains.render(batch);
-		
-		// Draw Rocks
-		for (Rock rock : rocks)
-		rock.render(batch);
-		
+
 		// Draw Water Overlay
 		waterOverlay.render(batch);
-		
+
+		// Draw Rocks
+		for (Rock rock : rocks)
+		{
+			rock.render(batch);
+
+		}
 		// Draw Clouds
 		clouds.render(batch);
 	}

@@ -98,7 +98,7 @@ public class WorldRenderer implements Disposable
 		}
 	}
 
-	
+
 	//this will show the FPS counter on the GUI
 	private void renderGuiFpsCounter (SpriteBatch batch) 
 	{
@@ -106,7 +106,7 @@ public class WorldRenderer implements Disposable
 		float y = cameraGUI.viewportHeight - 15;
 		int fps = Gdx.graphics.getFramesPerSecond();
 		BitmapFont fpsFont = Assets.instance.fonts.defaultNormal;
-		
+
 		if (fps >= 45) 
 		{
 			// 45 or more FPS show up in green
@@ -125,28 +125,28 @@ public class WorldRenderer implements Disposable
 			//really poor rendering performance
 			fpsFont.setColor(1, 0, 0, 1);
 		}
-		
+
 		fpsFont.draw(batch, "FPS: " + fps, x, y);
 		fpsFont.setColor(1, 1, 1, 1); // white
 	}
-	
+
 	//draw the GUI
 	private void renderGui (SpriteBatch batch) 
 	{
 		batch.setProjectionMatrix(cameraGUI.combined);
 		batch.begin();
-		
+
 		// draw collected gold coins icon + text
 		// (anchored to top left edge)
 		renderGuiScore(batch);
-		
+
 		// draw extra lives icon + text (anchored to top right edge)
 		renderGuiExtraLive(batch);
-		
+
 		// draw FPS text (anchored to bottom right edge)
 		renderGuiFpsCounter(batch);
 		batch.end();
-		}
+	}
 
 	//call it to free the allocated memory.
 	@Override
