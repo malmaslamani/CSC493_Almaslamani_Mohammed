@@ -7,28 +7,26 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+
 //import com.packtpub.libgdx.canyonbunny.util.Constants;
 import com.almaslamanigdx.game.Constants;
+
 //to use our new inner classes
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class Assets implements Disposable, AssetErrorListener
 {
 	public static final String TAG = Assets.class.getName();
 	public static final Assets instance = new Assets();
 	private AssetManager assetManager;
-
-	//	public AssetBunny bunny;
-	//	public AssetRock rock;
-	//	public AssetGoldCoin goldCoin;
-	//	public AssetFeather feather;
 	public AssetLevelDecoration levelDecoration;
 	public AssetMonkey monkey;
 	public AssetBanana banana;
 	public AssetPineApple pineApple;
 	public AssetRock rock;
-
+	public AssetFonts fonts;
 
 	//Singleton: prevent instantiation from other classes 
 	private Assets()
@@ -68,14 +66,13 @@ public class Assets implements Disposable, AssetErrorListener
 		}
 
 		// create game resource objects
-		//		bunny = new AssetBunny(atlas);
-		//		rock = new AssetRock(atlas);
-		//		goldCoin = new AssetGoldCoin(atlas);
-		//		feather = new AssetFeather(atlas);
+		fonts = new AssetFonts();
 		levelDecoration = new AssetLevelDecoration(atlas);
 		monkey = new AssetMonkey(atlas);
 		banana = new AssetBanana(atlas);
 		pineApple = new AssetPineApple(atlas);
+		rock = new AssetRock(atlas);
+		
 
 	}
 
@@ -84,6 +81,9 @@ public class Assets implements Disposable, AssetErrorListener
 	public void dispose() 
 	{
 		assetManager.dispose();
+		fonts.defaultSmall.dispose();
+		fonts.defaultNormal.dispose();
+		fonts.defaultBig.dispose();
 	}
 
 	@Override
@@ -96,44 +96,6 @@ public class Assets implements Disposable, AssetErrorListener
 
 	//The constructor takes a reference of the corresponding
 	//atlas in which it will find the atlas region it wants.
-	/**	public class AssetBunny 
-	{
-		public final AtlasRegion head;
-		public AssetBunny (TextureAtlas atlas) 
-		{
-			head = atlas.findRegion("bunny_head");
-		}
-	}
-
-	public class AssetRock 
-	{
-		public final AtlasRegion edge;
-		public final AtlasRegion middle;
-		public AssetRock (TextureAtlas atlas) 
-		{
-			edge = atlas.findRegion("rock_edge");
-			middle = atlas.findRegion("rock_middle");
-		}
-	}
-
-	public class AssetGoldCoin 
-	{
-		public final AtlasRegion goldCoin;
-		public AssetGoldCoin (TextureAtlas atlas) 
-		{
-			goldCoin = atlas.findRegion("item_gold_coin");
-		}
-	}
-
-	public class AssetFeather 
-	{
-		public final AtlasRegion feather;
-		public AssetFeather (TextureAtlas atlas) 
-		{
-			feather = atlas.findRegion("item_feather");
-		}
-	}
-	 **/
 	//this class contains monkey asset
 	public class AssetMonkey
 	{
@@ -151,8 +113,8 @@ public class Assets implements Disposable, AssetErrorListener
 		public final AtlasRegion middle;
 		public AssetRock (TextureAtlas atlas) 
 		{
-			edge = atlas.findRegion("SmallIsland");
-			middle = atlas.findRegion("MediumIsland");
+			edge = atlas.findRegion("SmallRock");
+			middle = atlas.findRegion("MediumRock");
 		}
 	}
 
@@ -196,6 +158,37 @@ public class Assets implements Disposable, AssetErrorListener
 			mountainLeft = atlas.findRegion("mountain_left");
 			mountainRight = atlas.findRegion("mountain_right");
 			waterOverlay = atlas.findRegion("water_overlay");
+		}
+	}
+
+	public class AssetFonts 
+	{
+		public final BitmapFont defaultSmall;
+		public final BitmapFont defaultNormal;
+		public final BitmapFont defaultBig;
+		public AssetFonts () 
+		{
+			
+			// create three fonts using Libgdx's 15px bitmap font
+			defaultSmall = new BitmapFont(
+					Gdx.files.internal("images/arial-15.fnt"), true);
+			defaultNormal = new BitmapFont(
+					Gdx.files.internal("images/arial-15.fnt"), true);
+			defaultBig = new BitmapFont(
+					Gdx.files.internal("images/arial-15.fnt"), true);
+			
+			// set font sizes
+			defaultSmall.getData().setScale(0.75f);
+			defaultNormal.getData().setScale(1.0f);
+			defaultBig.getData().setScale(2.0f);
+			
+			// enable linear texture filtering for smooth fonts
+			defaultSmall.getRegion().getTexture().setFilter(
+					TextureFilter.Linear, TextureFilter.Linear);
+			defaultNormal.getRegion().getTexture().setFilter(
+					TextureFilter.Linear, TextureFilter.Linear);
+			defaultBig.getRegion().getTexture().setFilter(
+					TextureFilter.Linear, TextureFilter.Linear);
 		}
 	}
 

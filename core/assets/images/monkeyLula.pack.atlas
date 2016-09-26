@@ -4,14 +4,14 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-MediumIsland
+MediumRock
   rotate: false
   xy: 2, 260
   size: 512, 297
   orig: 512, 297
   offset: 0, 0
   index: -1
-SmallIsland
+SmallRock
   rotate: false
   xy: 516, 419
   size: 250, 138

@@ -25,15 +25,15 @@ public class CanyonBunnyMain implements ApplicationListener
 
 		// Load assets
 		Assets.instance.init(new AssetManager());
-		
+
 		//Initialize controller and rendered
 		worldController = new WorldController();
 		worldRenderer = new WorldRenderer(worldController);
 
 		//Game world is active on start
 		paused = false;
-		
-	
+
+
 	}
 
 	@Override
@@ -45,13 +45,13 @@ public class CanyonBunnyMain implements ApplicationListener
 	@Override
 	public void render() 
 	{
-			//Update game world by the time that has passed 
-			//since last rendered frame.
-			worldController.update(Gdx.graphics.getDeltaTime());
-			
+		//Update game world by the time that has passed 
+		//since last rendered frame.
+		worldController.update(Gdx.graphics.getDeltaTime());
+
 		//sets the clear screen color to: Cornflower Blue
 		Gdx.gl.glClearColor(0x64/255.0f,  0x95/255.0f, 0xed/255.0f, 0xff/255.0f);
-		
+
 		//clears the screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

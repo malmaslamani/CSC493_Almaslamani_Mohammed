@@ -11,12 +11,16 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.almaslamanigdx.game.Rock;
+import com.almaslamanigdx.game.Constants;
+import com.almaslamanigdx.game.Level;
 
 public class WorldController extends InputAdapter
 {
-	public Sprite[] testSprites;
-	public int selectedSprite;
 	public CameraHelper cameraHelper;
+	public Level level;
+	public int lives;
+	public int score;
 
 
 	private static final String TAG = WorldController.class.getName();
@@ -31,53 +35,15 @@ public class WorldController extends InputAdapter
 	{
 		Gdx.input.setInputProcessor(this);
 		cameraHelper = new CameraHelper();
-		initTestObjects();
+		lives = Constants.LIVES_START;
+		initLevel();
 	}
-
-	private void initTestObjects() 
+	
+	
+	private void initLevel () 
 	{
-		//create new array for  sprites
-		testSprites = new Sprite[5];
-
-		// Create a list of texture regions
-		Array<TextureRegion> regions = new Array<TextureRegion>();
-//		regions.add(Assets.instance.bunny.head);
-//		regions.add(Assets.instance.feather.feather);
-//		regions.add(Assets.instance.goldCoin.goldCoin);
-		regions.add(Assets.instance.monkey.monkey);
-		regions.add(Assets.instance.banana.banana);
-		regions.add(Assets.instance.pineApple.pineApple);
-				
-		
-		//create empty POT-sized pixmap with 8 bit RGBA pixel data
-		int width = 32;
-		int height = 32;
-		Pixmap pixmap = createProceduralPixmap(width, height);
-
-		//create new texture from pixmap data
-		Texture texture = new Texture(pixmap);
-
-		//create new sprites using the just created texture
-		for(int i = 0; i < testSprites.length; i++)
-		{
-			Sprite spr = new Sprite(regions.random());
-
-			//Define sprite size to be 1m x 1m in game world
-			spr.setSize(1, 1);
-
-			//set origin to sprite's center
-			spr.setOrigin(spr.getWidth() / 2.0f, spr.getHeight() / 2.0f);
-
-			//calculate random position for sprite
-			float randomX = MathUtils.random(-2.0f,2.0f);
-			float randomY = MathUtils.random(-2.0f,2.0f);
-			spr.setPosition(randomX, randomY);
-
-			//put new sprite into array
-			testSprites[i] = spr;
-		}
-		//set first sprite as selected one
-		selectedSprite = 0;
+		score = 0;
+		level = new Level(Constants.LEVEL_01);
 	}
 
 	private Pixmap createProceduralPixmap(int width, int height) 
@@ -103,24 +69,9 @@ public class WorldController extends InputAdapter
 	public void update(float deltaTime)
 	{
 		handleDebugInput(deltaTime);
-		updateTestObjects(deltaTime);
 		cameraHelper.update(deltaTime);
 	}
 
-	private void updateTestObjects(float deltaTime) 
-	{
-		//get current rotation from selected sprite
-		float rotation = testSprites[selectedSprite].getRotation();
-
-		//rotate sprite by 90 degrees per second 
-		rotation += 90* deltaTime;
-
-		//Wrap around at 360 degrees
-		rotation %=360;
-
-		//set new rotation value to selected.sprite
-		testSprites[selectedSprite].setRotation(rotation);
-	}
 
 	//agraaaaaaaa mn al ktaaab 3n dee pg 128
 	private void handleDebugInput(float deltaTime) 
@@ -128,28 +79,6 @@ public class WorldController extends InputAdapter
 		if(Gdx.app.getType() != ApplicationType.Desktop)
 		{
 			return;
-		}
-
-		//selected sprite controls
-		float sprMoveSpeed = 5* deltaTime;
-		if(Gdx.input.isKeyPressed(Keys.A))
-		{
-			moveSelectedSprite(-sprMoveSpeed,0);
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.D))
-		{
-			moveSelectedSprite(sprMoveSpeed,0);
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.W))
-		{
-			moveSelectedSprite(0,sprMoveSpeed);
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.S))
-		{
-			moveSelectedSprite(0,-sprMoveSpeed);
 		}
 
 		//camera controls (move)
@@ -210,10 +139,6 @@ public class WorldController extends InputAdapter
 		cameraHelper.setPosition(x, y);
 	}
 
-	private void moveSelectedSprite(float x, float y) 
-	{
-		testSprites[selectedSprite].translate(x, y);		
-	}
 
 	@Override
 	public boolean keyUp(int keycode)
@@ -223,27 +148,6 @@ public class WorldController extends InputAdapter
 		{
 			init();
 			Gdx.app.debug(TAG, "Game world resetted");
-		}
-
-		//select next sprite
-		else if(keycode == Keys.SPACE)
-		{
-			selectedSprite = (selectedSprite + 1) % testSprites.length;
-			Gdx.app.debug(TAG,  "Sprite #" + selectedSprite + "selected");
-
-			//update camera's target to follow the currently
-			//selected sprite
-			if(cameraHelper.hasTarget())
-			{
-				cameraHelper.setTarget(testSprites[selectedSprite]);
-			}
-		} 
-
-		//Toggle camera follow
-		else if(keycode == Keys.ENTER)
-		{
-			cameraHelper.setTarget(cameraHelper.hasTarget()? null : testSprites[selectedSprite]);
-			Gdx.app.debug(TAG, "Camera follow enabled: " + cameraHelper.hasTarget());
 		}
 		return false;
 	}
