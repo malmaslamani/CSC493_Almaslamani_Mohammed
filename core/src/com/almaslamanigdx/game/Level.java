@@ -9,18 +9,25 @@ import com.almaslamanigdx.game.Clouds;
 import com.almaslamanigdx.game.Mountains;
 import com.almaslamanigdx.game.Rock;
 import com.almaslamanigdx.game.WaterOverlay;
+import com.almaslamanigdx.game.Monkey;
+import com.almaslamanigdx.game.PineApple;
+import com.almaslamanigdx.game.Banana;
 
 public class Level  
 {
+	public Monkey monkey;
+	public Array<Banana> banana;
+	public Array<PineApple> pineApple;
+	
 	public static final String TAG = Level.class.getName();
-
+	
 	public enum BLOCK_TYPE 
 	{
 		EMPTY(0, 0, 0), // black
 		ROCK(0, 255, 0), // green
 		PLAYER_SPAWNPOINT(255, 255, 255), // white
-		ITEM_FEATHER(255, 0, 255), // purple
-		ITEM_GOLD_COIN(255, 255, 0); // yellow
+		ITEM_PINEAPPLE(255, 0, 255), // purple
+		ITEM_BANANA(255, 255, 0); // yellow
 
 		private int color;
 
@@ -54,8 +61,13 @@ public class Level
 
 	private void init (String filename) 
 	{
+		// player character
+		monkey = null;
+		
 		// objects
 		rocks = new Array<Rock>();
+		banana = new Array<Banana>();
+		pineApple = new Array<PineApple>();
 
 		// load image file that represents the level data
 		Pixmap pixmap = new Pixmap(Gdx.files.internal(filename));
@@ -104,16 +116,28 @@ public class Level
 				// player spawn point
 				else if(BLOCK_TYPE.PLAYER_SPAWNPOINT.sameColor(currentPixel)) 
 				{
+					obj = new Monkey();
+					offsetHeight = -3.0f;
+					obj.position.set(pixelX,baseHeight * obj.dimension.y +offsetHeight);
+					monkey = (Monkey)obj;
 				}
 
-				// feather
-				else if (BLOCK_TYPE.ITEM_FEATHER.sameColor(currentPixel)) 
+				// PineApple
+				else if (BLOCK_TYPE.ITEM_PINEAPPLE.sameColor(currentPixel)) 
 				{
+					obj = new PineApple();
+					offsetHeight = -1.5f;
+					obj.position.set(pixelX,baseHeight * obj.dimension.y+ offsetHeight);
+					pineApple.add((PineApple)obj);
 				}
 
 				// gold coin
-				else if (BLOCK_TYPE.ITEM_GOLD_COIN.sameColor(currentPixel)) 
+				else if (BLOCK_TYPE.ITEM_BANANA.sameColor(currentPixel)) 
 				{
+					obj = new Banana();
+					offsetHeight = -1.5f;
+					obj.position.set(pixelX,baseHeight * obj.dimension.y+ offsetHeight);
+					banana.add((Banana)obj);
 				}
 
 				// unknown object/pixel color
@@ -153,12 +177,39 @@ public class Level
 		// Draw Rocks
 		for (Rock rock : rocks)
 			rock.render(batch);
+		
+		// Draw Bananas
+		for (Banana banana : banana)
+		banana.render(batch);
+		
+		// Draw pineApple
+		for (PineApple pineApple : pineApple)
+		pineApple.render(batch);
+		
+		// Draw Player Character
+		monkey.render(batch);
 
 		// Draw Water Overlay
 		waterOverlay.render(batch);
 		
 		// Draw Clouds
 		clouds.render(batch);
+	}
+	
+	public void update (float deltaTime) 
+	{
+		monkey.update(deltaTime);
+		
+		for(Rock rock : rocks)
+			rock.update(deltaTime);
+		
+		for(Banana banana : banana)
+			banana.update(deltaTime);
+		
+		for(PineApple pineApple : pineApple)
+			pineApple.update(deltaTime);
+		
+		clouds.update(deltaTime);
 	}
 }
 

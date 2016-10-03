@@ -1,19 +1,17 @@
 package com.almaslamanigdx.game;
 
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import com.almaslamanigdx.game.Rock;
 import com.almaslamanigdx.game.Constants;
 import com.almaslamanigdx.game.Level;
+import com.badlogic.gdx.math.Rectangle;
+import com.almaslamanigdx.game.Monkey;
+import com.almaslamanigdx.game.Monkey.JUMP_STATE;
+import com.almaslamanigdx.game.PineApple;
+import com.almaslamanigdx.game.Banana;
 
 public class WorldController extends InputAdapter
 {
@@ -21,10 +19,125 @@ public class WorldController extends InputAdapter
 	public Level level;
 	public int lives;
 	public int score;
-
-
+	private float timeLeftGameOverDelay;
 	private static final String TAG = WorldController.class.getName();
 
+	// Rectangles for collision detection
+	private Rectangle r1 = new Rectangle();
+	private Rectangle r2 = new Rectangle();
+
+	//called when a collision is detected. Then, the monkey game object
+	//is moved accordingly to prevent it from falling through our platforms
+	private void onCollisionMonkeyWithRock(Rock rock) 
+	{
+		Monkey monkey = level.monkey;
+
+		float heightDifference = Math.abs(monkey.position.y - ( rock.position.y + rock.bounds.height));
+
+		if (heightDifference > 0.25f) 
+		{
+			boolean hitRightEdge = monkey.position.x > (rock.position.x + rock.bounds.width / 2.0f);
+
+			if (hitRightEdge) 
+			{
+				monkey.position.x = rock.position.x + rock.bounds.width;
+			} 
+			else 
+			{
+				monkey.position.x = rock.position.x -monkey.bounds.width;
+			}
+			return;
+		}
+
+		switch (monkey.jumpState) 
+		{
+		case GROUNDED:
+			break;
+
+		case FALLING:
+
+		case JUMP_FALLING: 
+			monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
+			monkey.jumpState = JUMP_STATE.GROUNDED;
+			break;
+
+		case JUMP_RISING:
+			monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
+			break;
+		}
+	}
+
+	//collisions between the bunny head game object and a gold coin
+	//game object. It simply flags the gold coin as being collected so that it will disappear.
+	private void onCollisionMonkeyWithBanana(Banana banana) 
+	{
+		banana.collected = true;
+		score += banana.getScore();
+		Gdx.app.log(TAG, "banana collected");
+	}
+
+	//handles collisions between the bunny head game object and
+	//a feather game object and refreshes the effect for the monkey
+	private void onCollisionMonkeyWithPineApple(PineApple pineApple) 
+	{
+		pineApple.collected = true;
+		score += pineApple.getScore();
+		level.monkey.setPineApplePowerup(true);
+		Gdx.app.log(TAG, "pineApple collected");
+	}
+
+	//testCollisions() that iterates through all
+	//the game objects and tests whether there is a collision between the monkey and
+	//another game object.
+	private void testCollisions () 
+	{
+		r1.set(level.monkey.position.x, level.monkey.position.y,
+				level.monkey.bounds.width, level.monkey.bounds.height);
+
+		// Test collision: monkey <-> Rocks
+		for (Rock rock : level.rocks) 
+		{
+			r2.set(rock.position.x, rock.position.y, rock.bounds.width,
+					rock.bounds.height);
+			if (!r1.overlaps(r2)) 
+				continue;
+			onCollisionMonkeyWithRock(rock);
+			// IMPORTANT: must do all collisions for valid
+			// edge testing on rocks.
+		}
+
+		// Test collision: Bunny Head <-> bananas
+		for (Banana banana : level.banana)
+		{
+			if (banana.collected) 
+				continue;
+
+			r2.set(banana.position.x, banana.position.y,
+					banana.bounds.width, banana.bounds.height);
+
+			if (!r1.overlaps(r2)) 
+				continue;
+
+			onCollisionMonkeyWithBanana(banana);
+			break;
+		}
+
+		// Test collision: Bunny Head <-> pineApple
+		for (PineApple pineApple : level.pineApple) 
+		{
+			if (pineApple.collected) 
+				continue;
+
+			r2.set(pineApple.position.x, pineApple.position.y,
+					pineApple.bounds.width, pineApple.bounds.height);
+
+			if (!r1.overlaps(r2)) 
+				continue;
+
+			onCollisionMonkeyWithPineApple(pineApple);
+			break;
+		}
+	}
 	public WorldController () 
 	{
 		init();
@@ -36,44 +149,48 @@ public class WorldController extends InputAdapter
 		Gdx.input.setInputProcessor(this);
 		cameraHelper = new CameraHelper();
 		lives = Constants.LIVES_START;
+		timeLeftGameOverDelay = 0;
 		initLevel();
 	}
-	
-	
+
+
 	private void initLevel () 
 	{
 		score = 0;
 		level = new Level(Constants.LEVEL_01);
-	}
-
-	private Pixmap createProceduralPixmap(int width, int height) 
-	{
-		Pixmap pixmap = new Pixmap(width,height, Format.RGBA8888);
-
-		//Fill square with red color at 50% opacity
-		pixmap.setColor(1, 0, 0, 0.5f);
-		pixmap.fill();
-
-		//draw a yellow colored X shape on square
-		pixmap.setColor(0, 1, 0, 1);
-		pixmap.drawLine(0, 0, width, height);
-		pixmap.drawLine(width, 0, 0, height);
-
-		//draw a cayan colored border around square
-		pixmap.setColor(0,1,1,1);
-		pixmap.drawRectangle(0, 0, width, height);
-
-		return pixmap;
+		cameraHelper.setTarget(level.monkey);
 	}
 
 	public void update(float deltaTime)
 	{
 		handleDebugInput(deltaTime);
+		if (isGameOver()) 
+		{
+			timeLeftGameOverDelay -= deltaTime;
+
+			if (timeLeftGameOverDelay < 0) 
+				init();
+		} 
+		else 
+		{
+			handleInputGame(deltaTime);
+		}
+		handleInputGame(deltaTime);
+		level.update(deltaTime);
+		testCollisions();
 		cameraHelper.update(deltaTime);
+
+		if (!isGameOver() && isPlayerInWater()) 
+		{
+			lives--;
+			if (isGameOver())
+				timeLeftGameOverDelay = Constants.TIME_DELAY_GAME_OVER;
+			else
+				initLevel();
+		}
 	}
 
 
-	//agraaaaaaaa mn al ktaaab 3n dee pg 128
 	private void handleDebugInput(float deltaTime) 
 	{
 		if(Gdx.app.getType() != ApplicationType.Desktop)
@@ -81,35 +198,37 @@ public class WorldController extends InputAdapter
 			return;
 		}
 
-		//camera controls (move)
-		float camMoveSpeed = 5 * deltaTime;
-		float camMoveSpeedAccelerationFactor = 5;
+		if (!cameraHelper.hasTarget(level.monkey)) 
+		{
+			//camera controls (move)
+			float camMoveSpeed = 5 * deltaTime;
+			float camMoveSpeedAccelerationFactor = 5;
 
-		if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT))
-		{
-			camMoveSpeed *=camMoveSpeedAccelerationFactor;
+			if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT))
+			{
+				camMoveSpeed *=camMoveSpeedAccelerationFactor;
+			}
+			if(Gdx.input.isKeyPressed(Keys.LEFT))
+			{
+				moveCamera(-camMoveSpeed,0);
+			}
+			if(Gdx.input.isKeyPressed(Keys.RIGHT))
+			{
+				moveCamera(camMoveSpeed,0);
+			}
+			if(Gdx.input.isKeyPressed(Keys.UP))
+			{
+				moveCamera(0,camMoveSpeed);
+			}
+			if(Gdx.input.isKeyPressed(Keys.DOWN))
+			{
+				moveCamera(0,-camMoveSpeed);
+			}
+			if(Gdx.input.isKeyPressed(Keys.BACKSPACE))
+			{
+				cameraHelper.setPosition(0, 0);
+			}
 		}
-		if(Gdx.input.isKeyPressed(Keys.LEFT))
-		{
-			moveCamera(-camMoveSpeed,0);
-		}
-		if(Gdx.input.isKeyPressed(Keys.RIGHT))
-		{
-			moveCamera(camMoveSpeed,0);
-		}
-		if(Gdx.input.isKeyPressed(Keys.UP))
-		{
-			moveCamera(0,camMoveSpeed);
-		}
-		if(Gdx.input.isKeyPressed(Keys.DOWN))
-		{
-			moveCamera(0,-camMoveSpeed);
-		}
-		if(Gdx.input.isKeyPressed(Keys.BACKSPACE))
-		{
-			cameraHelper.setPosition(0, 0);
-		}
-
 		//camera controls   (zoom)
 		float camZoomSpeed = 1* deltaTime;
 		float camZoomSpeedAccelerationFactor = 5;
@@ -149,6 +268,59 @@ public class WorldController extends InputAdapter
 			init();
 			Gdx.app.debug(TAG, "Game world resetted");
 		}
+
+		// Toggle camera follow
+		else if (keycode == Keys.ENTER)
+		{
+			cameraHelper.setTarget(cameraHelper.hasTarget()? null: level.monkey);
+			Gdx.app.debug(TAG, "Camera follow enabled: "+ cameraHelper.hasTarget());
+		}
 		return false;
+	}
+
+	//control the monkey with right, left keys...
+	private void handleInputGame (float deltaTime) 
+	{
+		if (cameraHelper.hasTarget(level.monkey)) 
+		{
+			// Player Movement
+			if (Gdx.input.isKeyPressed(Keys.LEFT)) 
+			{
+				level.monkey.velocity.x = -level.monkey.terminalVelocity.x;
+			} 
+			else if (Gdx.input.isKeyPressed(Keys.RIGHT))
+			{
+				level.monkey.velocity.x =level.monkey.terminalVelocity.x;
+			} 
+			else 
+			{
+				// Execute auto-forward movement on non-desktop platform
+				if (Gdx.app.getType() != ApplicationType.Desktop)
+				{
+					level.monkey.velocity.x = level.monkey.terminalVelocity.x;
+				}
+			}
+			// monkey Jump
+			if (Gdx.input.isTouched() ||Gdx.input.isKeyPressed(Keys.SPACE)) 
+			{
+				level.monkey.setJumping(true);
+			} 
+			else 
+			{
+				level.monkey.setJumping(false);
+			}
+		}
+	}
+
+	public boolean isGameOver () 
+	{
+		return lives < 0;
+	}
+
+	//test the monkey vertical position to find out
+	//whether it fell down into the water.
+	public boolean isPlayerInWater () 
+	{
+		return level.monkey.position.y < -5;
 	}
 }

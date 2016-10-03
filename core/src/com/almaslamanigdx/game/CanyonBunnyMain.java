@@ -12,7 +12,6 @@ public class CanyonBunnyMain implements ApplicationListener
 	private static final String TAG = CanyonBunnyMain.class.getName();
 	private WorldController worldController;
 	private WorldRenderer worldRenderer;
-	private boolean paused;
 
 
 	@Override
@@ -29,11 +28,6 @@ public class CanyonBunnyMain implements ApplicationListener
 		//Initialize controller and rendered
 		worldController = new WorldController();
 		worldRenderer = new WorldRenderer(worldController);
-
-		//Game world is active on start
-		paused = false;
-
-
 	}
 
 	@Override
@@ -59,23 +53,24 @@ public class CanyonBunnyMain implements ApplicationListener
 		worldRenderer.render();
 	}
 
-	@Override
-	public void pause() 
-	{		
-		paused = true;
-	}
-
-	@Override
-	public void resume() 
-	{		
-		paused = false;
-	}
 
 	@Override
 	public void dispose() 
 	{
 		worldRenderer.dispose();
 		Assets.instance.dispose();
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
