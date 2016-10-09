@@ -153,11 +153,11 @@ public class MenuScreen extends AbstractGameScreen
 	{
 		Table layer = new Table();
 		// + Coins
-		imgCoins = new Image(skinCanyonBunny, "coins");
+		imgCoins = new Image(skinCanyonBunny, "banana");
 		layer.addActor(imgCoins);
 		imgCoins.setPosition(135, 80);
 		// + Bunny
-		imgBunny = new Image(skinCanyonBunny, "bunny");
+		imgBunny = new Image(skinCanyonBunny, "monkey");
 		layer.addActor(imgBunny);
 		imgBunny.setPosition(355, 40);
 		return layer;

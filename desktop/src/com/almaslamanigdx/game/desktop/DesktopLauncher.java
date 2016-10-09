@@ -21,8 +21,8 @@ public class DesktopLauncher
 			settings.maxWidth = 1024;
 			settings.maxHeight = 1024;
 			settings.debug = drawDebugOutline;
-			TexturePacker.process(settings, "assets-raw/images","../core/assets/images","monkeyLula.pack");
-			TexturePacker.process(settings, "assets-raw/images-ui","../core/assets/images","monkeyLula-ui.pack");
+			TexturePacker.process(settings, "assets-raw/images","../core/assets/images","monkeyLula.atlas");
+			TexturePacker.process(settings, "assets-raw/images-ui","../core/assets/images","monkeyLula-ui.atlas");
 		}
 
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
