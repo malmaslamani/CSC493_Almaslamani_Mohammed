@@ -12,6 +12,8 @@ import com.almaslamanigdx.game.Monkey;
 import com.almaslamanigdx.game.Monkey.JUMP_STATE;
 import com.almaslamanigdx.game.PineApple;
 import com.almaslamanigdx.game.Banana;
+import com.badlogic.gdx.Game;
+import com.almaslamanigdx.game.MenuScreen;
 
 public class WorldController extends InputAdapter
 {
@@ -21,10 +23,27 @@ public class WorldController extends InputAdapter
 	public int score;
 	private float timeLeftGameOverDelay;
 	private static final String TAG = WorldController.class.getName();
+	private Game game;
 
 	// Rectangles for collision detection
 	private Rectangle r1 = new Rectangle();
 	private Rectangle r2 = new Rectangle();
+
+	//reference when we need to switch the screen
+	public WorldController (Game game) 
+	{
+		this.game = game;
+		init();
+	}
+
+
+	//save a reference to the game instance, which will enable us to
+	//switch to another screen.
+	private void backToMenu ()
+	{
+		// switch to menu screen
+		game.setScreen(new MenuScreen(game));
+	}
 
 	//called when a collision is detected. Then, the monkey game object
 	//is moved accordingly to prevent it from falling through our platforms
@@ -138,10 +157,7 @@ public class WorldController extends InputAdapter
 			break;
 		}
 	}
-	public WorldController () 
-	{
-		init();
-	}
+
 
 	//to rebuild whenever we want
 	private void init() 
@@ -169,13 +185,15 @@ public class WorldController extends InputAdapter
 			timeLeftGameOverDelay -= deltaTime;
 
 			if (timeLeftGameOverDelay < 0) 
-				init();
+				backToMenu();
+
 		} 
 		else 
 		{
 			handleInputGame(deltaTime);
 		}
-		handleInputGame(deltaTime);
+
+		//////////////////mdryy	handleInputGame(deltaTime);
 		level.update(deltaTime);
 		testCollisions();
 		cameraHelper.update(deltaTime);
@@ -275,6 +293,13 @@ public class WorldController extends InputAdapter
 			cameraHelper.setTarget(cameraHelper.hasTarget()? null: level.monkey);
 			Gdx.app.debug(TAG, "Camera follow enabled: "+ cameraHelper.hasTarget());
 		}
+
+		// Back to Menu
+		else if (keycode == Keys.ESCAPE || keycode == Keys.BACK) 
+		{
+			backToMenu();
+		}
+
 		return false;
 	}
 

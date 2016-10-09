@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.almaslamanigdx.game.Assets;
 import com.almaslamanigdx.game.Constants;
+import com.almaslamanigdx.game.CharacterSkin;
+import com.almaslamanigdx.game.GamePreferences;
 
 public class Monkey extends AbstractGameObject
 {
@@ -191,6 +193,10 @@ public class Monkey extends AbstractGameObject
 	public void render(SpriteBatch batch) 
 	{
 		TextureRegion reg = null;
+		
+		// Apply Skin Color
+		batch.setColor(
+		CharacterSkin.values()[GamePreferences.instance.charSkin].getColor());
 		
 		// Set special color when game object has a feather power-up
 		if (hasPineApplePowerup) 

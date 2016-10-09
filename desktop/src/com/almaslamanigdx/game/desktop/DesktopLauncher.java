@@ -11,8 +11,8 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings;
 public class DesktopLauncher 
 {
 	public static boolean rebuildAtlas = false;
-	public static boolean drawDebugOutline = false;
-	
+	public static boolean drawDebugOutline = true;
+
 	public static void main (String[] arg) 
 	{
 		if (rebuildAtlas) 
@@ -20,16 +20,16 @@ public class DesktopLauncher
 			Settings settings = new Settings();
 			settings.maxWidth = 1024;
 			settings.maxHeight = 1024;
-			settings.duplicatePadding = false;
 			settings.debug = drawDebugOutline;
-			TexturePacker.process(settings, "assets-raw/images", "../core/assets/images","monkeyLula.pack");
-			}
-		
+			TexturePacker.process(settings, "assets-raw/images","../core/assets/images","monkeyLula.pack");
+			TexturePacker.process(settings, "assets-raw/images-ui","../core/assets/images","monkeyLula-ui.pack");
+		}
+
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "TheMonkeyGame";
 		cfg.width = 800;
 		cfg.height = 480;
 		new LwjglApplication(new CanyonBunnyMain(), cfg);
-		
+
 	}
 }

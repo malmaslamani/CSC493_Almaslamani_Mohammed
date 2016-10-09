@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Align;
+import com.almaslamanigdx.game.GamePreferences;
 
 public class WorldRenderer implements Disposable
 {
@@ -87,14 +88,13 @@ public class WorldRenderer implements Disposable
 	//to draw the extrea lives in the gui
 	private void renderGuiExtraLive (SpriteBatch batch) 
 	{
-		float x = cameraGUI.viewportWidth - 50 -
-				Constants.LIVES_START * 50;
+		float x = cameraGUI.viewportWidth - 50 - Constants.LIVES_START * 50;
 		float y = -15;
-		for (int i = 0; i < Constants.LIVES_START; i++) {
+		for (int i = 0; i < Constants.LIVES_START; i++) 
+		{
 			if (worldController.lives <= i)
 				batch.setColor(0.5f, 0.5f, 0.5f, 0.5f);
-			batch.draw(Assets.instance.monkey.monkey,
-					x + i * 50, y, 50, 50, 120, 100, 0.35f, -0.35f, 0);
+			batch.draw(Assets.instance.monkey.monkey,x + i * 50, y, 50, 50, 120, 100, 0.35f, -0.35f, 0);
 			batch.setColor(1, 1, 1, 1);
 		}
 	}
@@ -134,7 +134,7 @@ public class WorldRenderer implements Disposable
 		// draw collected gold coins icon + text
 		// (anchored to top left edge)
 		renderGuiScore(batch);
-		
+
 		// draw collected feather icon (anchored to top left edge)
 		renderGuiFeatherPowerup(batch);
 
@@ -142,11 +142,15 @@ public class WorldRenderer implements Disposable
 		renderGuiExtraLive(batch);
 
 		// draw FPS text (anchored to bottom right edge)
+		if (GamePreferences.instance.showFpsCounter)
+			renderGuiFpsCounter(batch);
+
+		// draw FPS text (anchored to bottom right edge)
 		renderGuiFpsCounter(batch);
-		
+
 		// draw game over text
 		renderGuiGameOverMessage(batch);
-		
+
 		batch.end();
 	}
 	//calculates the center of the GUI camera's viewport. The text is rendered
@@ -175,7 +179,7 @@ public class WorldRenderer implements Disposable
 		float x = -15;
 		float y = 30;
 		float timeLeftPineApplePowerup = worldController.level.monkey.timeLeftPineApplePowerup;
-		
+
 		if (timeLeftPineApplePowerup > 0) 
 		{
 			// Start icon fade in/out if the left power-up time
