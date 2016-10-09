@@ -20,12 +20,12 @@ import com.almaslamanigdx.game.BunnyHead.JUMP_STATE;
 import com.almaslamanigdx.game.Feather;
 import com.almaslamanigdx.game.GoldCoin;
 import com.almaslamanigdx.game.Rock;
-
-
-
+import com.badlogic.gdx.Game;
+import com.almaslamanigdx.game.MenuScreen;
 
 public class WorldController extends InputAdapter
 {
+	private Game game;
 	private static final String TAG = WorldController.class.getName();
 	public CameraHelper cameraHelper;
 	public Level level;
@@ -35,6 +35,19 @@ public class WorldController extends InputAdapter
 	public int lives;
 	public int score;
 
+	//changed it to hold ref of Game to use it in switching screens
+	public WorldController (Game game) 
+	{
+		this.game = game;
+		init();
+	}
+	
+	//make us able to switch screens. and mainly the menu screen for now.
+	private void backToMenu () 
+	{
+		game.setScreen(new MenuScreen(game));
+	}
+	
 	private void initLevel()
 	{
 		score = 0;
@@ -44,11 +57,6 @@ public class WorldController extends InputAdapter
 		cameraHelper.setTarget(level.bunnyHead);
 	}
 
-
-	public WorldController () 
-	{
-		init();
-	}
 
 	//to rebuild whenever we want
 	private void init() 
@@ -91,7 +99,9 @@ public class WorldController extends InputAdapter
 		{
 			timeLeftGameOverDelay -= deltaTime;
 			if (timeLeftGameOverDelay < 0) 
-				init();
+			{
+				backToMenu();
+			}
 		} 
 		else 
 		{
@@ -227,7 +237,12 @@ public class WorldController extends InputAdapter
 			Gdx.app.debug(TAG, "Camera follow enabled: "
 					+ cameraHelper.hasTarget());
 		}
-
+		
+		// Back to Menu
+		else if (keycode == Keys.ESCAPE || keycode == Keys.BACK) 
+		{
+			backToMenu();
+		}
 		return false;
 	}
 	//iterates through all the game objects and tests whether 

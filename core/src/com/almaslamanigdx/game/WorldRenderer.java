@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Align;
+import com.almaslamanigdx.game.GamePreferences;
 
 
 public class WorldRenderer implements Disposable
@@ -140,7 +140,7 @@ public class WorldRenderer implements Disposable
 		// draw collected gold coins icon + text
 		// (anchored to top left edge)
 		renderGuiScore(batch);
-		
+
 		// draw collected feather icon (anchored to top left edge)
 		renderGuiFeatherPowerup(batch);
 
@@ -148,11 +148,17 @@ public class WorldRenderer implements Disposable
 		renderGuiExtraLive(batch);
 
 		// draw FPS text (anchored to bottom right edge)
+		if (GamePreferences.instance.showFpsCounter)
+		{
+			renderGuiFpsCounter(batch);
+		}
+
+		// draw FPS text (anchored to bottom right edge)
 		renderGuiFpsCounter(batch);
-		
+
 		// draw game over text
 		renderGuiGameOverMessage(batch);
-		
+
 		batch.end();
 	}
 
@@ -172,7 +178,7 @@ public class WorldRenderer implements Disposable
 		}
 	}
 
-	
+
 	//checks whether there is still time left for the feather power-up effect
 	//to end. Only if this is the case, a feather icon is drawn in the top-left corner under the
 	//gold coin icon. A small number is drawn next to it that displays the rounded time
@@ -184,7 +190,7 @@ public class WorldRenderer implements Disposable
 		float x = -15;
 		float y = 30;
 		float timeLeftFeatherPowerup = worldController.level.bunnyHead.timeLeftFeatherPowerup;
-		
+
 		if (timeLeftFeatherPowerup > 0) 
 		{
 			// Start icon fade in/out if the left power-up time
