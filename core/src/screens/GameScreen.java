@@ -1,11 +1,13 @@
-package com.almaslamanigdx.game;
+package screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+
+import util.GamePreferences;
+
 import com.almaslamanigdx.game.WorldController;
 import com.almaslamanigdx.game.WorldRenderer;
-import com.almaslamanigdx.game.GamePreferences;
 
 public class GameScreen extends AbstractGameScreen 
 {

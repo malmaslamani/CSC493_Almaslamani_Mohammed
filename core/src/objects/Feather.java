@@ -1,4 +1,4 @@
-package com.almaslamanigdx.game;
+package objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -8,13 +8,12 @@ import com.almaslamanigdx.game.Assets;
 //can be collected by the player's character by simply walking over it. As
 //a result of the gold coin being collected, the object will turn invisible for the rest of
 //the game.
-public class GoldCoin extends AbstractGameObject 
+public class Feather extends AbstractGameObject 
 {
-
-	private TextureRegion regGoldCoin;
+	private TextureRegion regFeather;
 	public boolean collected;
 
-	public GoldCoin () 
+	public Feather () 
 	{
 		init();
 	}
@@ -22,34 +21,35 @@ public class GoldCoin extends AbstractGameObject
 	private void init () 
 	{
 		dimension.set(0.5f, 0.5f);
-		regGoldCoin = Assets.instance.goldCoin.goldCoin;
+		regFeather = Assets.instance.feather.feather;
 
 		// Set bounding box for collision detection
 		bounds.set(0, 0, dimension.x, dimension.y);
 		collected = false;
+
 	}
 
 	//The render() method will always check the collected state to decide whether the object
 	//should be rendered or not
 	@Override
-	public void render (SpriteBatch batch) 
+	public void render(SpriteBatch batch) 
 	{
 		if (collected) 
 			return;
 
 		TextureRegion reg = null;
-		reg = regGoldCoin;
+		reg = regFeather;
 
-		batch.draw(reg.getTexture(), position.x, position.y,origin.x, origin.y, dimension.x, dimension.y, scale.x, scale.y,
+		batch.draw(reg.getTexture(), position.x, position.y,
+				origin.x, origin.y, dimension.x, dimension.y, scale.x, scale.y,
 				rotation, reg.getRegionX(), reg.getRegionY(),
 				reg.getRegionWidth(), reg.getRegionHeight(), false, false);
 	}
 
-	//The render() method will always check the collected state to decide whether the object
-	//should be rendered or not
+	//returns the item's score that the
+	//player will receive to collect it.
 	public int getScore() 
 	{
-		return 100;
-	}	
+		return 250;
+	}
 }
-

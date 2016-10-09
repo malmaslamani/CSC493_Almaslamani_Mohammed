@@ -4,9 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
+
+import util.Constants;
+import util.GamePreferences;
+
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Align;
-import com.almaslamanigdx.game.GamePreferences;
 
 
 public class WorldRenderer implements Disposable

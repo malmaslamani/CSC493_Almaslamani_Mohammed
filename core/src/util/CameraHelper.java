@@ -1,9 +1,10 @@
-package com.almaslamanigdx.game;
+package util;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.almaslamanigdx.game.AbstractGameObject;
+
+import objects.AbstractGameObject;
 
 public class CameraHelper 
 {

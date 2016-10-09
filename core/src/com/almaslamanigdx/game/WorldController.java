@@ -12,16 +12,19 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.almaslamanigdx.game.Rock;
-import com.almaslamanigdx.game.Constants;
+
+import objects.BunnyHead;
+import objects.Feather;
+import objects.GoldCoin;
+import objects.Level;
+import objects.Rock;
+import objects.BunnyHead.JUMP_STATE;
+import screens.MenuScreen;
+import util.CameraHelper;
+import util.Constants;
+
 import com.badlogic.gdx.math.Rectangle;
-import com.almaslamanigdx.game.BunnyHead;
-import com.almaslamanigdx.game.BunnyHead.JUMP_STATE;
-import com.almaslamanigdx.game.Feather;
-import com.almaslamanigdx.game.GoldCoin;
-import com.almaslamanigdx.game.Rock;
 import com.badlogic.gdx.Game;
-import com.almaslamanigdx.game.MenuScreen;
 
 public class WorldController extends InputAdapter
 {

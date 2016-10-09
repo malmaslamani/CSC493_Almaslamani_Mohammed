@@ -1,17 +1,9 @@
-package com.almaslamanigdx.game;
+package objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.almaslamanigdx.game.AbstractGameObject;
-import com.almaslamanigdx.game.Clouds;
-import com.almaslamanigdx.game.Mountains;
-import com.almaslamanigdx.game.Rock;
-import com.almaslamanigdx.game.WaterOverlay;
-import com.almaslamanigdx.game.BunnyHead;
-import com.almaslamanigdx.game.Feather;
-import com.almaslamanigdx.game.GoldCoin;
 
 public class Level 
 {

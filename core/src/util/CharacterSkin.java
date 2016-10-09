@@ -1,4 +1,4 @@
-package com.almaslamanigdx.game;
+package util;
 //should be in util
 
 

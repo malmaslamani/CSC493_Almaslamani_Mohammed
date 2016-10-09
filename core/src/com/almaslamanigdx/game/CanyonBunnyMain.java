@@ -4,8 +4,10 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+
+import screens.MenuScreen;
+
 import com.almaslamanigdx.game.Assets;
-import com.almaslamanigdx.game.MenuScreen;
 
 public class CanyonBunnyMain extends Game 
 {
