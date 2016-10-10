@@ -284,31 +284,7 @@ public class MenuScreen extends AbstractGameScreen
 		winOptions.setVisible(true);
 	}
 
-	//load and save are used to translate back
-	//and forth between the values stored in the widgets and the instance
-	private void loadSettings() 
-	{
-		GamePreferences prefs = GamePreferences.instance;
-		prefs.load();
-		chkSound.setChecked(prefs.sound);
-		sldSound.setValue(prefs.volSound);
-		chkMusic.setChecked(prefs.music);
-		sldMusic.setValue(prefs.volMusic);
-		selCharSkin.setSelectedIndex(prefs.charSkin);
-		onCharSkinSelected(prefs.charSkin);
-		chkShowFpsCounter.setChecked(prefs.showFpsCounter);
-	}
-	private void saveSettings() 
-	{
-		GamePreferences prefs = GamePreferences.instance;
-		prefs.sound = chkSound.isChecked();
-		prefs.volSound = sldSound.getValue();
-		prefs.music = chkMusic.isChecked();
-		prefs.volMusic = sldMusic.getValue();
-		prefs.charSkin = selCharSkin.getSelectedIndex();
-		prefs.showFpsCounter = chkShowFpsCounter.isChecked();
-		prefs.save();
-	}
+	
 
 	//will update the preview image.
 	private void onCharSkinSelected(int index) 
@@ -482,6 +458,32 @@ public class MenuScreen extends AbstractGameScreen
 	{
 
 	}
+	
+	//load and save are used to translate back
+		//and forth between the values stored in the widgets and the instance
+		private void loadSettings() 
+		{
+			GamePreferences prefs = GamePreferences.instance;
+			prefs.load();
+			chkSound.setChecked(prefs.sound);
+			sldSound.setValue(prefs.volSound);
+			chkMusic.setChecked(prefs.music);
+			sldMusic.setValue(prefs.volMusic);
+			selCharSkin.setSelectedIndex(prefs.charSkin);
+			onCharSkinSelected(prefs.charSkin);
+			chkShowFpsCounter.setChecked(prefs.showFpsCounter);
+		}
+		private void saveSettings() 
+		{
+			GamePreferences prefs = GamePreferences.instance;
+			prefs.sound = chkSound.isChecked();
+			prefs.volSound = sldSound.getValue();
+			prefs.music = chkMusic.isChecked();
+			prefs.volMusic = sldMusic.getValue();
+			prefs.charSkin = selCharSkin.getSelectedIndex();
+			prefs.showFpsCounter = chkShowFpsCounter.isChecked();
+			prefs.save();
+		}
 
 
 }

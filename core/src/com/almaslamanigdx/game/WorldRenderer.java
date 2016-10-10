@@ -156,9 +156,6 @@ public class WorldRenderer implements Disposable
 			renderGuiFpsCounter(batch);
 		}
 
-		// draw FPS text (anchored to bottom right edge)
-		renderGuiFpsCounter(batch);
-
 		// draw game over text
 		renderGuiGameOverMessage(batch);
 
