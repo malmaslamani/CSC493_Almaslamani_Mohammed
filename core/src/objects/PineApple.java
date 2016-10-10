@@ -1,32 +1,31 @@
-package com.almaslamanigdx.game;
+package objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.almaslamanigdx.game.Assets;
 
 //uses the collected variable to store its current state of visibility.
-public class Banana extends AbstractGameObject
+//same as Banana.java
+public class PineApple extends AbstractGameObject
 {
-	private TextureRegion regBanana;
+	private TextureRegion regPineApple;
 	public boolean collected;
-	
-	public Banana () 
+
+	public PineApple()
 	{
 		init();
 	}
-	
+
 	private void init () 
 	{
 		dimension.set(0.5f, 0.5f);
-		regBanana = Assets.instance.banana.banana;
-		
+		regPineApple = Assets.instance.pineApple.pineApple;
+
 		// Set bounding box for collision detection
 		bounds.set(0, 0, dimension.x, dimension.y);
 		collected = false;
 	}
-	
-	//check the collected state to decide whether the object
-	//should be rendered or not.
+
 	public void render (SpriteBatch batch) 
 	{
 		if (collected) 
@@ -34,7 +33,7 @@ public class Banana extends AbstractGameObject
 		
 		TextureRegion reg = null;
 		
-		reg = regBanana;
+		reg = regPineApple;
 		
 		batch.draw(reg.getTexture(), position.x, position.y,
 				origin.x, origin.y, dimension.x, dimension.y, scale.x, scale.y,
@@ -42,11 +41,8 @@ public class Banana extends AbstractGameObject
 				reg.getRegionWidth(), reg.getRegionHeight(), false, false);
 	}
 	
-	//returns the item's score that the
-	//player will receive to collect it.
 	public int getScore() 
 	{
-		return 100;
+		return 250;
 	}
 }
-

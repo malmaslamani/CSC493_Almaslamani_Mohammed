@@ -6,11 +6,10 @@ import com.badlogic.gdx.assets.AssetErrorListener;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Disposable;
+
+import util.Constants;
+
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
-
-//import com.packtpub.libgdx.canyonbunny.util.Constants;
-import com.almaslamanigdx.game.Constants;
-
 //to use our new inner classes
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;

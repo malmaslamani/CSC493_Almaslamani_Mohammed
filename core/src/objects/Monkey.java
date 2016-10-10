@@ -1,11 +1,13 @@
-package com.almaslamanigdx.game;
+package objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+import util.CharacterSkin;
+import util.Constants;
+import util.GamePreferences;
+
 import com.almaslamanigdx.game.Assets;
-import com.almaslamanigdx.game.Constants;
-import com.almaslamanigdx.game.CharacterSkin;
-import com.almaslamanigdx.game.GamePreferences;
 
 public class Monkey extends AbstractGameObject
 {
@@ -94,7 +96,7 @@ public class Monkey extends AbstractGameObject
 			if (jumpKeyPressed && hasPineApplePowerup) 
 			{
 				timeJumping = JUMP_TIME_OFFSET_FLYING;
-				jumpState = JUMP_STATE.JUMP_RISING;
+				//jumpState = JUMP_STATE.JUMP_RISING;
 			}
 			break;
 		}

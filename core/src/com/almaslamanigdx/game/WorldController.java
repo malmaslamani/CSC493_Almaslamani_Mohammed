@@ -4,16 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
-import com.almaslamanigdx.game.Rock;
-import com.almaslamanigdx.game.Constants;
 import com.almaslamanigdx.game.Level;
 import com.badlogic.gdx.math.Rectangle;
-import com.almaslamanigdx.game.Monkey;
-import com.almaslamanigdx.game.Monkey.JUMP_STATE;
-import com.almaslamanigdx.game.PineApple;
-import com.almaslamanigdx.game.Banana;
+
+import objects.Banana;
+import objects.Monkey;
+import objects.PineApple;
+import objects.Rock;
+import objects.Monkey.JUMP_STATE;
+import screens.MenuScreen;
+import util.CameraHelper;
+import util.Constants;
+
 import com.badlogic.gdx.Game;
-import com.almaslamanigdx.game.MenuScreen;
 
 public class WorldController extends InputAdapter
 {

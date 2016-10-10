@@ -1,4 +1,4 @@
-package com.almaslamanigdx.game;
+package objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

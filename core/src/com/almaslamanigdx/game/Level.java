@@ -4,14 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.almaslamanigdx.game.AbstractGameObject;
-import com.almaslamanigdx.game.Clouds;
-import com.almaslamanigdx.game.Mountains;
-import com.almaslamanigdx.game.Rock;
-import com.almaslamanigdx.game.WaterOverlay;
-import com.almaslamanigdx.game.Monkey;
-import com.almaslamanigdx.game.PineApple;
-import com.almaslamanigdx.game.Banana;
+
+import objects.AbstractGameObject;
+import objects.Banana;
+import objects.Clouds;
+import objects.Monkey;
+import objects.Mountains;
+import objects.PineApple;
+import objects.Rock;
+import objects.WaterOverlay;
 
 public class Level  
 {

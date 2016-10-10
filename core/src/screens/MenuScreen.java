@@ -1,4 +1,4 @@
-package com.almaslamanigdx.game;
+package screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -21,10 +21,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+
+import util.CharacterSkin;
+import util.Constants;
+import util.GamePreferences;
+
 import com.almaslamanigdx.game.Assets;
-import com.almaslamanigdx.game.Constants;
-import com.almaslamanigdx.game.CharacterSkin;
-import com.almaslamanigdx.game.GamePreferences;
 
 public class MenuScreen extends AbstractGameScreen
 {
