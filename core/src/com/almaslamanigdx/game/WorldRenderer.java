@@ -81,8 +81,7 @@ public class WorldRenderer implements Disposable
 	{
 		float x = -15;
 		float y = -15;
-		batch.draw(Assets.instance.banana.banana,
-				x, y, 50, 50, 100, 100, 0.35f, -0.35f, 0);
+		batch.draw(Assets.instance.banana.banana,x, y, 50, 50, 100, 100, 0.35f, -0.35f, 0);
 		Assets.instance.fonts.defaultBig.draw(batch,
 				"" + worldController.score,
 				x + 75, y + 37);
@@ -148,8 +147,6 @@ public class WorldRenderer implements Disposable
 		if (GamePreferences.instance.showFpsCounter)
 			renderGuiFpsCounter(batch);
 
-		// draw FPS text (anchored to bottom right edge)
-		renderGuiFpsCounter(batch);
 
 		// draw game over text
 		renderGuiGameOverMessage(batch);
