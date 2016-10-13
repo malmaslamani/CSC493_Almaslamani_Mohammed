@@ -13,23 +13,23 @@ background
   index: -1
 banana
   rotate: false
-  xy: 602, 282
+  xy: 154, 24
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 info
   rotate: false
-  xy: 260, 207
+  xy: 260, 231
   size: 329, 82
   orig: 329, 82
   offset: 0, 0
   index: -1
 logo
   rotate: false
-  xy: 260, 291
-  size: 340, 119
-  orig: 340, 119
+  xy: 260, 315
+  size: 356, 95
+  orig: 356, 95
   offset: 0, 0
   index: -1
 monkey
