@@ -27,11 +27,14 @@ public class WorldController extends InputAdapter
 	private float timeLeftGameOverDelay;
 	private static final String TAG = WorldController.class.getName();
 	private Game game;
-
 	// Rectangles for collision detection
 	private Rectangle r1 = new Rectangle();
 	private Rectangle r2 = new Rectangle();
 
+	//vars to help the lives,bananas animation
+	public float livesVisual;
+	public float scoreVisual;
+	
 	//reference when we need to switch the screen
 	public WorldController (Game game) 
 	{
@@ -168,6 +171,7 @@ public class WorldController extends InputAdapter
 		Gdx.input.setInputProcessor(this);
 		cameraHelper = new CameraHelper();
 		lives = Constants.LIVES_START;
+		livesVisual = lives;
 		timeLeftGameOverDelay = 0;
 		initLevel();
 	}
@@ -176,6 +180,7 @@ public class WorldController extends InputAdapter
 	private void initLevel () 
 	{
 		score = 0;
+		scoreVisual = score;
 		level = new Level(Constants.LEVEL_01);
 		cameraHelper.setTarget(level.monkey);
 	}
@@ -196,7 +201,6 @@ public class WorldController extends InputAdapter
 			handleInputGame(deltaTime);
 		}
 
-		//////////////////mdryy	handleInputGame(deltaTime);
 		level.update(deltaTime);
 		testCollisions();
 		cameraHelper.update(deltaTime);
@@ -209,6 +213,19 @@ public class WorldController extends InputAdapter
 			else
 				initLevel();
 		}
+		
+		//All three mountain layers will now scroll at different speeds: 30 percent, 50 percent,
+		//and 80 percent.
+		level.mountains.updateScrollPosition
+		(cameraHelper.getPosition());
+		
+		//This enables us to play an animation as long
+		//as livesVisual has not yet reached the current value of lives
+		if (livesVisual> lives)
+			livesVisual = Math.max(lives, livesVisual - 1 * deltaTime);
+		
+		if (scoreVisual< score)
+			scoreVisual = Math.min(score, scoreVisual + 250 * deltaTime);
 	}
 
 
