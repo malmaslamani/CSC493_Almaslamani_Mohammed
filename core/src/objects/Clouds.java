@@ -52,18 +52,18 @@ public class Clouds extends AbstractGameObject
 	private void init () 
 	{
 		dimension.set(3.0f, 1.5f);
-		
+
 		regClouds = new Array<TextureRegion>();
-		
+
 		regClouds.add(Assets.instance.levelDecoration.cloud01);
 		regClouds.add(Assets.instance.levelDecoration.cloud02);
 		regClouds.add(Assets.instance.levelDecoration.cloud03);
-		
+
 		int distFac = 5;
 		int numClouds = (int)(length / distFac);
-		
+
 		clouds = new Array<Cloud>(2 * numClouds);
-		
+
 		for (int i = 0; i < numClouds; i++) 
 		{
 			Cloud cloud = spawnCloud();
@@ -71,8 +71,8 @@ public class Clouds extends AbstractGameObject
 			clouds.add(cloud);
 		}
 	}
-	
-	
+
+
 	private Cloud spawnCloud () 
 	{
 		Cloud cloud = new Cloud();
@@ -88,6 +88,16 @@ public class Clouds extends AbstractGameObject
 		pos.y += MathUtils.random(0.0f, 0.2f)* (MathUtils.randomBoolean() ? 1 : -1); // random additional position
 		cloud.position.set(pos);
 
+		// speed
+		Vector2 speed = new Vector2();
+		speed.x += 0.5f; // base speed
+
+		// random additional speed
+		speed.x += MathUtils.random(0.0f, 0.75f);
+		cloud.terminalVelocity.set(speed);
+		speed.x *= -1; // move left
+		cloud.velocity.set(speed);
+
 		return cloud;
 	}
 
@@ -98,6 +108,25 @@ public class Clouds extends AbstractGameObject
 		for (Cloud cloud : clouds)
 		{
 			cloud.render(batch);
+		}
+	}
+
+	//calls the update() method to
+	//let the physics move them
+	@Override
+	public void update (float deltaTime)
+	{
+		for (int i = clouds.size - 1; i>= 0; i--) 
+		{
+			Cloud cloud = clouds.get(i);
+			cloud.update(deltaTime);
+			if (cloud.position.x< -10) 
+			{
+				// cloud moved outside of world.
+				// destroy and spawn new cloud at end of level.
+				clouds.removeIndex(i);
+				clouds.add(spawnCloud());
+			}
 		}
 	}
 

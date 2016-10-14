@@ -37,6 +37,12 @@ public class WorldController extends InputAdapter
 	//count extra lives and score
 	public int lives;
 	public int score;
+	
+	//animation when losing a live variable
+	public float livesVisual;
+	
+	//animation when getting coins(score increased)
+	public float scoreVisual;
 
 	//changed it to hold ref of Game to use it in switching screens
 	public WorldController (Game game) 
@@ -67,6 +73,7 @@ public class WorldController extends InputAdapter
 		Gdx.input.setInputProcessor(this);
 		cameraHelper = new CameraHelper();
 		lives = Constants.LIVES_START;
+		livesVisual = lives;
 		timeLeftGameOverDelay = 0;
 		initLevel();
 	}
@@ -123,6 +130,20 @@ public class WorldController extends InputAdapter
 			else
 				initLevel();
 		}
+		
+		//All three mountain layers will now scroll at different speeds: 30 percent, 50 percent,
+		//and 80 percent.
+		level.mountains.updateScrollPosition
+		(cameraHelper.getPosition());
+		
+		//to make time to show the animation
+		//while the livesVisual is more than lives
+		if (livesVisual> lives)
+		livesVisual = Math.max(lives, livesVisual - 1 * deltaTime);
+		
+		//control the progress of the score animation.
+		if (scoreVisual< score)
+		scoreVisual = Math.min(score, scoreVisual+ 250 * deltaTime);
 	}
 
 

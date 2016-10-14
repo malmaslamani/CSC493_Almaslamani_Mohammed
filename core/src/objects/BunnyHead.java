@@ -1,12 +1,12 @@
 package objects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import util.CharacterSkin;
 import util.Constants;
 import util.GamePreferences;
-
 import com.almaslamanigdx.game.Assets;
 
 public class BunnyHead extends AbstractGameObject
@@ -16,6 +16,10 @@ public class BunnyHead extends AbstractGameObject
 	private final float JUMP_TIME_MAX = 0.3f;
 	private final float JUMP_TIME_MIN = 0.1f;
 	private final float JUMP_TIME_OFFSET_FLYING = JUMP_TIME_MAX - 0.018f;
+
+	//hold a reference to our loaded and readyto-
+	//fire dust particle effect.
+	public ParticleEffect dustParticles = new ParticleEffect();
 
 	//defined the viewing direction—a state for jumping and another
 	//state for the feather power-up
@@ -70,6 +74,10 @@ public class BunnyHead extends AbstractGameObject
 		// Power-ups
 		hasFeatherPowerup = false;
 		timeLeftFeatherPowerup = 0;
+
+		// Particles
+		dustParticles.load(Gdx.files.internal("particles/dust.pfx"),
+				Gdx.files.internal("particles"));
 	}
 
 
@@ -125,24 +133,26 @@ public class BunnyHead extends AbstractGameObject
 		return hasFeatherPowerup && timeLeftFeatherPowerup > 0;
 	}
 
-	
+
 	//handles the drawing of the image for the bunny head game
 	//object. The image will be tinted orange if the feather power-up effect is active.
 	@Override
 	public void render(SpriteBatch batch) 
 	{
 		TextureRegion reg = null;
-		
+
+		// Draw Particles
+		dustParticles.draw(batch);
+
 		// Apply Skin Color
-		batch.setColor(
-		CharacterSkin.values()[GamePreferences.instance.charSkin].getColor());
-		
+		batch.setColor(CharacterSkin.values()[GamePreferences.instance.charSkin].getColor());
+
 		// Set special color when game object has a feather power-up
 		if (hasFeatherPowerup) 
 		{
 			batch.setColor(1.0f, 0.8f, 0.0f, 1.0f);
 		}
-		
+
 		// Draw image
 		reg = regHead;
 		batch.draw(reg.getTexture(), position.x, position.y, origin.x,
@@ -150,7 +160,7 @@ public class BunnyHead extends AbstractGameObject
 				reg.getRegionX(), reg.getRegionY(), reg.getRegionWidth(),
 				reg.getRegionHeight(), viewDirection == VIEW_DIRECTION.LEFT,
 				false);
-		
+
 		// Reset color to white
 		batch.setColor(1, 1, 1, 1);
 	}
@@ -181,6 +191,8 @@ public class BunnyHead extends AbstractGameObject
 				setFeatherPowerup(false);
 			}
 		}
+		dustParticles.update(deltaTime);
+
 	}
 
 	//handles the calculations and switching of states that is needed to
@@ -191,6 +203,14 @@ public class BunnyHead extends AbstractGameObject
 		switch (jumpState) 
 		{
 		case GROUNDED:
+			jumpState = JUMP_STATE.FALLING;
+			
+			//when moving, the dust will be drawn 
+			if (velocity.x != 0) 
+			{
+				dustParticles.setPosition(position.x + dimension.x / 2,position.y);
+				dustParticles.start();
+			}
 			jumpState = JUMP_STATE.FALLING;
 			break;
 
@@ -221,7 +241,9 @@ public class BunnyHead extends AbstractGameObject
 			}
 		}
 		if (jumpState != JUMP_STATE.GROUNDED)
-			super.updateMotionY(deltaTime);
+			//need to be stopped to become invisible
+			dustParticles.allowCompletion();
+		super.updateMotionY(deltaTime);
 	}
 
 }
