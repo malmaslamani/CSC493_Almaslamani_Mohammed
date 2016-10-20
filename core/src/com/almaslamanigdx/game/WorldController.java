@@ -20,6 +20,7 @@ import objects.Level;
 import objects.Rock;
 import objects.BunnyHead.JUMP_STATE;
 import screens.MenuScreen;
+import util.AudioManager;
 import util.CameraHelper;
 import util.Constants;
 
@@ -80,25 +81,25 @@ public class WorldController extends InputAdapter
 
 
 
-	private Pixmap createProceduralPixmap(int width, int height) 
-	{
-		Pixmap pixmap = new Pixmap(width,height, Format.RGBA8888);
-
-		//Fill square with red color at 50% opacity
-		pixmap.setColor(1, 0, 0, 0.5f);
-		pixmap.fill();
-
-		//draw a yellow colored X shape on square
-		pixmap.setColor(0, 1, 0, 1);
-		pixmap.drawLine(0, 0, width, height);
-		pixmap.drawLine(width, 0, 0, height);
-
-		//draw a cayan colored border around square
-		pixmap.setColor(0,1,1,1);
-		pixmap.drawRectangle(0, 0, width, height);
-
-		return pixmap;
-	}
+//	private Pixmap createProceduralPixmap(int width, int height) 
+//	{
+//		Pixmap pixmap = new Pixmap(width,height, Format.RGBA8888);
+//
+//		//Fill square with red color at 50% opacity
+//		pixmap.setColor(1, 0, 0, 0.5f);
+//		pixmap.fill();
+//
+//		//draw a yellow colored X shape on square
+//		pixmap.setColor(0, 1, 0, 1);
+//		pixmap.drawLine(0, 0, width, height);
+//		pixmap.drawLine(width, 0, 0, height);
+//
+//		//draw a cayan colored border around square
+//		pixmap.setColor(0,1,1,1);
+//		pixmap.drawRectangle(0, 0, width, height);
+//
+//		return pixmap;
+//	}
 
 	//makes sure that all the game objects contained within the level will be
 	//updated when the update() is called
@@ -124,6 +125,7 @@ public class WorldController extends InputAdapter
 	
 		if (!isGameOver() && isPlayerInWater()) 
 		{
+			AudioManager.instance.play(Assets.instance.sounds.liveLost);
 			lives--;
 			if (isGameOver())
 				timeLeftGameOverDelay = Constants.TIME_DELAY_GAME_OVER;
@@ -324,18 +326,22 @@ public class WorldController extends InputAdapter
 
 	//This code handles collisions between the bunny head game object and a gold coin
 	//game object. It simply flags the gold coin as being collected so that it will disappear.
+	//play the sound of picking goldcoin
 	private void onCollisionBunnyWithGoldCoin(GoldCoin goldcoin) 
 	{
 		goldcoin.collected = true;
+		AudioManager.instance.play(Assets.instance.sounds.pickupCoin);
 		score += goldcoin.getScore();
 		Gdx.app.log(TAG, "Gold coin collected");
 	}
 
 	//This code handles collisions between the bunny head game object and
 	//a feather game object. The handling of this collision is similar gold coin.
+	//playing audio when getting feather.
 	private void onCollisionBunnyWithFeather(Feather feather) 
 	{
 		feather.collected = true;
+		AudioManager.instance.play(Assets.instance.sounds.pickupFeather);
 		score += feather.getScore();
 		level.bunnyHead.setFeatherPowerup(true);
 		Gdx.app.log(TAG, "Feather collected");
