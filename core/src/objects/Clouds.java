@@ -98,8 +98,10 @@ public class Clouds extends AbstractGameObject
 			cloud.render(batch);
 	}
 
-	//let the physics move them(clouds)
-	//if moved off the screen it will be removed from the list of clouds
+	/**
+	 * let the physics move them(clouds)
+	 *  if moved off the screen it will be removed from the list of clouds
+	 */
 	@Override
 	public void update (float deltaTime) 
 	{

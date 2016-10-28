@@ -75,7 +75,10 @@ public class WorldRenderer implements Disposable
 		cameraGUI.update();
 	}
 
-	//to draw the score in the gui
+	/**
+	 * to draw the score in the gui
+	 * @param batch
+	 */
 	private void renderGuiScore (SpriteBatch batch) 
 	{
 		float x = -15;
@@ -94,7 +97,10 @@ public class WorldRenderer implements Disposable
 		Assets.instance.fonts.defaultBig.draw(batch,"" + (int)worldController.scoreVisual,x + 75, y + 37);
 	}
 
-	//to draw the extrea lives in the gui
+	/**
+	 * to draw the extrea lives in the gui
+	 * @param batch
+	 */
 	private void renderGuiExtraLive (SpriteBatch batch) 
 	{
 		float x = cameraGUI.viewportWidth - 50 - Constants.LIVES_START * 50;
@@ -148,7 +154,9 @@ public class WorldRenderer implements Disposable
 		fpsFont.setColor(1, 1, 1, 1); // white
 	}
 
-	// to draw the gui
+	/**
+	 *  to draw the gui
+	 */
 	private void renderGui (SpriteBatch batch) 
 	{
 		batch.setProjectionMatrix(cameraGUI.combined);
@@ -174,9 +182,13 @@ public class WorldRenderer implements Disposable
 
 		batch.end();
 	}
-	//calculates the center of the GUI camera's viewport. The text is rendered
-	//using the big font from our assets. Its color is changed using the setColor() method
-	//of BitmapFont.
+	
+	/**
+	 * calculates the center of the GUI camera's viewport. 
+	 * The text is rendered using the big font from our assets. 
+	 * Its color is changed using the setColor() method of BitmapFont.
+	 * @param batch
+	 */
 	private void renderGuiGameOverMessage (SpriteBatch batch) 
 	{
 		float x = cameraGUI.viewportWidth / 2;
@@ -192,9 +204,11 @@ public class WorldRenderer implements Disposable
 		}
 	}
 
-	//This method first checks whether there is still time left for the pineapple power-up effect
-	//to end. Only if this is the case, a pineapple icon is drawn in the top-left corner under the
-	//banana icon.
+	/**
+	 * This method first checks whether there is still time left for the pineapple power-up effect to end. 
+	 * Only if this is the case, a pineapple icon is drawn in the top-left corner under the banana icon.
+	 * @param batch
+	 */
 	private void renderGuiFeatherPowerup (SpriteBatch batch) 
 	{
 		float x = -15;
@@ -219,7 +233,9 @@ public class WorldRenderer implements Disposable
 		}
 	}
 
-	//call it to free the allocated memory.
+	/**
+	 * call it to free the allocated memory.
+	 */
 	@Override
 	public void dispose() 
 	{		

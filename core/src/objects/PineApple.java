@@ -4,8 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.almaslamanigdx.game.Assets;
 
-//uses the collected variable to store its current state of visibility.
-//same as Banana.java
+/**
+ * uses the collected variable to store its current state of visibility. same as Banana.java
+ */
 public class PineApple extends AbstractGameObject
 {
 	private TextureRegion regPineApple;

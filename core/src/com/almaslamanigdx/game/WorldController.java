@@ -13,6 +13,7 @@ import objects.PineApple;
 import objects.Rock;
 import objects.Monkey.JUMP_STATE;
 import screens.MenuScreen;
+import util.AudioManager;
 import util.CameraHelper;
 import util.Constants;
 
@@ -27,6 +28,7 @@ public class WorldController extends InputAdapter
 	private float timeLeftGameOverDelay;
 	private static final String TAG = WorldController.class.getName();
 	private Game game;
+	
 	// Rectangles for collision detection
 	private Rectangle r1 = new Rectangle();
 	private Rectangle r2 = new Rectangle();
@@ -43,16 +45,20 @@ public class WorldController extends InputAdapter
 	}
 
 
-	//save a reference to the game instance, which will enable us to
-	//switch to another screen.
+	/**
+	 * save a reference to the game instance, which will enable us to switch to another screen.
+	 */
 	private void backToMenu ()
 	{
 		// switch to menu screen
 		game.setScreen(new MenuScreen(game));
 	}
 
-	//called when a collision is detected. Then, the monkey game object
-	//is moved accordingly to prevent it from falling through our platforms
+	/**
+	 * called when a collision is detected. 
+	 * Then, the monkey game object is moved accordingly to prevent it from falling through our platforms
+	 * @param rock
+	 */
 	private void onCollisionMonkeyWithRock(Rock rock) 
 	{
 		Monkey monkey = level.monkey;
@@ -92,28 +98,39 @@ public class WorldController extends InputAdapter
 		}
 	}
 
-	//collisions between the bunny head game object and a gold coin
-	//game object. It simply flags the gold coin as being collected so that it will disappear.
+	/**
+	 * collisions between the bunny head game object and a gold coin
+	 * 	game object. It simply flags the gold coin as being collected so that it will disappear.
+
+	 */
 	private void onCollisionMonkeyWithBanana(Banana banana) 
 	{
 		banana.collected = true;
+		AudioManager.instance.play(Assets.instance.sounds.eatBanana);
 		score += banana.getScore();
 		Gdx.app.log(TAG, "banana collected");
 	}
 
-	//handles collisions between the bunny head game object and
-	//a feather game object and refreshes the effect for the monkey
+	/**
+	 * handles collisions between the bunny head game object 
+	 * and a feather game object and refreshes the effect for the monkey
+	 * @param pineApple
+	 */
 	private void onCollisionMonkeyWithPineApple(PineApple pineApple) 
 	{
 		pineApple.collected = true;
+		
 		score += pineApple.getScore();
+		AudioManager.instance.play(Assets.instance.sounds.eatBanana);
 		level.monkey.setPineApplePowerup(true);
 		Gdx.app.log(TAG, "pineApple collected");
 	}
 
-	//testCollisions() that iterates through all
-	//the game objects and tests whether there is a collision between the monkey and
-	//another game object.
+	/**
+	 * testCollisions() that iterates through all the game objects 
+	 * and tests whether there is a collision 
+	 * between the monkey and another game object.
+	 */
 	private void testCollisions () 
 	{
 		r1.set(level.monkey.position.x, level.monkey.position.y,
@@ -165,7 +182,9 @@ public class WorldController extends InputAdapter
 	}
 
 
-	//to rebuild whenever we want
+	/**
+	 * to rebuild whenever we want
+	 */
 	private void init() 
 	{
 		Gdx.input.setInputProcessor(this);
@@ -185,6 +204,11 @@ public class WorldController extends InputAdapter
 		cameraHelper.setTarget(level.monkey);
 	}
 
+	/**
+	 * makes the game return to menu if it is over,
+	 * updates the lives we see , and update our level
+	 * @param deltaTime
+	 */
 	public void update(float deltaTime)
 	{
 		handleDebugInput(deltaTime);
@@ -207,7 +231,11 @@ public class WorldController extends InputAdapter
 
 		if (!isGameOver() && isPlayerInWater()) 
 		{
+			//will play live_lost.wav when player hit the water.
+			AudioManager.instance.play(Assets.instance.sounds.liveLost);
+		
 			lives--;
+			
 			if (isGameOver())
 				timeLeftGameOverDelay = Constants.TIME_DELAY_GAME_OVER;
 			else
@@ -228,7 +256,10 @@ public class WorldController extends InputAdapter
 			scoreVisual = Math.min(score, scoreVisual + 250 * deltaTime);
 	}
 
-
+	/**
+	 * handles the camera movement
+	 * @param deltaTime
+	 */
 	private void handleDebugInput(float deltaTime) 
 	{
 		if(Gdx.app.getType() != ApplicationType.Desktop)
@@ -289,6 +320,11 @@ public class WorldController extends InputAdapter
 		}
 	}
 
+	/**
+	 * Moving the camera around
+	 * @param x
+	 * @param y
+	 */
 	private void moveCamera(float x,float y)
 	{
 		x += cameraHelper.getPosition().x;
@@ -297,6 +333,9 @@ public class WorldController extends InputAdapter
 	}
 
 
+	/**
+	 * handles resetting the game or following the character by camera.
+	 */
 	@Override
 	public boolean keyUp(int keycode)
 	{
@@ -323,7 +362,10 @@ public class WorldController extends InputAdapter
 		return false;
 	}
 
-	//control the monkey with right, left keys...
+	/**
+	 * control the monkey with right, left keys...
+	 * @param deltaTime
+	 */
 	private void handleInputGame (float deltaTime) 
 	{
 		if (cameraHelper.hasTarget(level.monkey)) 
@@ -357,13 +399,18 @@ public class WorldController extends InputAdapter
 		}
 	}
 
+	/**
+	 * checks if game is over
+	 * @return
+	 */
 	public boolean isGameOver () 
 	{
 		return lives < 0;
 	}
 
-	//test the monkey vertical position to find out
-	//whether it fell down into the water.
+	/**
+	 * test the monkey vertical position to find out whether it fell down into the water.
+	 */
 	public boolean isPlayerInWater () 
 	{
 		return level.monkey.position.y < -5;

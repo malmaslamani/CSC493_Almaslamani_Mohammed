@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.almaslamanigdx.game.Assets;
 
-//uses the collected variable to store its current state of visibility.
+/**
+ * uses the collected variable to store its current state of visibility.
+ */
 public class Banana extends AbstractGameObject
 {
 	private TextureRegion regBanana;
@@ -25,8 +27,9 @@ public class Banana extends AbstractGameObject
 		collected = false;
 	}
 	
-	//check the collected state to decide whether the object
-	//should be rendered or not.
+	/**
+	 * check the collected state to decide whether the object should be rendered or not.
+	 */
 	public void render (SpriteBatch batch) 
 	{
 		if (collected) 
@@ -42,8 +45,10 @@ public class Banana extends AbstractGameObject
 				reg.getRegionWidth(), reg.getRegionHeight(), false, false);
 	}
 	
-	//returns the item's score that the
-	//player will receive to collect it.
+	/**
+	 * returns the item's score that the player will receive to collect it.
+	 * @return 100
+	 */
 	public int getScore() 
 	{
 		return 100;

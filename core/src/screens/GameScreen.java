@@ -1,6 +1,6 @@
 package screens;
 
-import com.badlogic.gdx.Screen;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -50,7 +50,9 @@ public class GameScreen extends AbstractGameScreen
 		worldRenderer.resize(width, height);
 	}
 
-	//acts like create()
+	/**
+	 * acts like create()
+	 */
 	@Override
 	public void show () 
 	{
@@ -60,7 +62,10 @@ public class GameScreen extends AbstractGameScreen
 		Gdx.input.setCatchBackKey(true);
 	}
 
-	//acts like dispose()
+	/**
+	 * acts like dispose()
+	 * @see screens.AbstractGameScreen#hide()
+	 */
 	@Override
 	public void hide () 
 	{

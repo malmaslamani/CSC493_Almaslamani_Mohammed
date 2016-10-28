@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
+import util.AudioManager;
 import util.CharacterSkin;
 import util.Constants;
 import util.GamePreferences;
@@ -64,17 +65,16 @@ public class MenuScreen extends AbstractGameScreen
 		super(game);
 	}
 
-	//clear the screen by filling it solid black and
-	//checks if the screen has been touched or not.
+	/**
+	 * clear the screen by filling it solid black 
+	 * and checks if the screen has been touched or not.
+	 */
 	@Override
 	public void render (float deltaTime) 
 	{
 		Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		//	if(Gdx.input.isTouched())
-		//		game.setScreen(new GameScreen(game)); // not suuuuuuuuuuuuuuure
-		//switch to the game screen when the screen is touched
-		//and draw debug lines around objects when they need.
+
 		if (debugEnabled) 
 		{
 			debugRebuildStage -= deltaTime;
@@ -86,16 +86,20 @@ public class MenuScreen extends AbstractGameScreen
 		}
 		stage.act(deltaTime);
 		stage.draw();
-		stage.setDebugAll(true);
+		stage.setDebugAll(false);//to draw debug lines on the menu screen, have to be true.
 	}
 
-	//sets the viewport size of the stage.
+	/**
+	 * sets the viewport size of the stage.
+	 */
 	@Override public void resize (int width, int height) 
 	{
 		stage.getViewport().update(width, height, true);
 	}
 
-	//called when the screen is shown,initializes the stage, and ready to receive inputs
+	/**
+	 * called when the screen is shown,initializes the stage, and ready to receive inputs
+	 */
 	@Override public void show () 
 	{
 		stage = new Stage(new StretchViewport(Constants.VIEWPORT_GUI_WIDTH,Constants.VIEWPORT_GUI_HEIGHT));
@@ -103,7 +107,9 @@ public class MenuScreen extends AbstractGameScreen
 		rebuildStage();
 	}
 
-	//free the allocated resources when the screen is hidden
+	/**
+	 * free the allocated resources when the screen is hidden
+	 */
 	@Override public void hide () 
 	{
 		stage.dispose();
@@ -112,9 +118,11 @@ public class MenuScreen extends AbstractGameScreen
 
 	@Override public void pause () { }
 
-	//will make up the final scene of our
-	//menu screen. This method is implemented in a way so that it can be called in a
-	//repeated manner
+	/**
+	 * will make up the final scene of our menu screen. 
+	 * This method is implemented in a way so that it can be 
+	 * called in a repeated manner
+	 */
 	private void rebuildStage ()
 	{
 		skinCanyonBunny = new Skin(Gdx.files.internal(Constants.SKIN_CANYONBUNNY_UI),new TextureAtlas(Constants.TEXTURE_ATLAS_UI));
@@ -140,7 +148,10 @@ public class MenuScreen extends AbstractGameScreen
 		stage.addActor(layerOptionsWindow);
 	}
 
-	//background image drawn to the scene of the menu screen
+	/**
+	 * background image drawn to the scene of the menu screen
+	 * @return tbl
+	 */
 	private Table buildBackgroundLayer () 
 	{
 		Table layer = new Table();
@@ -150,7 +161,10 @@ public class MenuScreen extends AbstractGameScreen
 		return layer;
 	}
 
-	//an image of some coins and another image of a huge bunny head TO BE CHANGED
+	/**
+	 * an image of some coins and another image of a huge bunny head TO BE CHANGED
+	 * @return tbl
+	 */
 	private Table buildObjectsLayer () 
 	{
 		Table layer = new Table();
@@ -165,7 +179,10 @@ public class MenuScreen extends AbstractGameScreen
 		return layer;
 	}
 
-	//in the top-left corner of the screen
+	/**
+	 * in the top-left corner of the screen
+	 * @return tbl
+	 */
 	private Table buildLogosLayer () 
 	{
 		Table layer = new Table();
@@ -186,8 +203,10 @@ public class MenuScreen extends AbstractGameScreen
 		return layer;
 	}
 
-	//in the bottom-right corner of the screen. A new button
-	//widget is added using the Play style
+	/**
+	 * in the bottom-right corner of the screen. A new button widget is added using the Play style
+	 * @return tbl
+	 */
 	private Table buildControlsLayer () 
 	{
 		Table layer = new Table();
@@ -223,8 +242,11 @@ public class MenuScreen extends AbstractGameScreen
 		return layer;
 	}
 
-	//initializes the Options window. It builds each
-	//part of the menu using the build methods
+	/**
+	 * initializes the Options window.
+	 *  It builds each part of the menu using the build methods
+	 * @return tbl
+	 */
 	private Table buildOptionsWindowLayer () 
 	{
 		winOptions = new Window("Options", skinLibgdx);
@@ -257,7 +279,10 @@ public class MenuScreen extends AbstractGameScreen
 		return winOptions;
 	}
 
-	//builds a table containing the audio settings labels and checkbox
+	/**
+	 * builds a table containing the audio settings labels and checkbox
+	 * @return tbl
+	 */
 	private Table buildOptWinAudioSettings () 
 	{
 		Table tbl = new Table();
@@ -289,8 +314,10 @@ public class MenuScreen extends AbstractGameScreen
 	}
 
 
-	//builds a table that contains the character skin selection via a drop-down
-	//box and a preview image next to it
+	/**
+	 * builds a table that contains the character skin selection via a drop-down box and a preview image next to it
+	 * @return tbl
+	 */
 	private Table buildOptWinSkinSelection ()
 	{
 		Table tbl = new Table();
@@ -389,10 +416,11 @@ public class MenuScreen extends AbstractGameScreen
 
 	}
 
-	//used to translate back
-	//and forth between the values stored in the widgets and the instance of the
-	//GamePreferences class. 
-	//for load() and save()
+	/**
+	 * used to translate back and forth between the values stored in the widgets 
+	 * and the instance of the GamePreferences class. 
+	 * for load() and save()
+	 */
 	private void loadSettings() 
 	{
 		GamePreferences prefs = GamePreferences.instance;
@@ -417,13 +445,17 @@ public class MenuScreen extends AbstractGameScreen
 		prefs.save();
 	}
 
-	//when the mouse is clicked it should set the screen (game screen)
+	/**
+	 * when the mouse is clicked it should set the screen (game screen)
+	 */
 	private void onPlayClicked () 
 	{
 		game.setScreen(new GameScreen(game));
 	}
 	
-	//allows the Options window to be opened,, setting loaded first
+	/**
+	 * allows the Options window to be opened,, setting loaded first
+	 */
 	private void onOptionsClicked () 
 	{
 		loadSettings();
@@ -432,26 +464,36 @@ public class MenuScreen extends AbstractGameScreen
 		winOptions.setVisible(true);
 	}
 
-	//will update the preview image
+	/**
+	 * will update the preview image
+	 */
 	private void onCharSkinSelected(int index) 
 	{
 		CharacterSkin skin = CharacterSkin.values()[index];
 		imgCharSkin.setColor(skin.getColor());
 	}
-	//saves the current settings of the Options window 
-	//and swaps the Options to menu controls
+	/**saves the current settings of the Options window 
+	 * and swaps the Options to menu controls
+	 */
 	private void onSaveClicked() 
 	{
 		saveSettings();
 		onCancelClicked();
+		
+		/** when the Options menu is closed, the audio manager
+		 * will start or stop the music depending on the current audio settings.
+		 */
+		AudioManager.instance.onSettingsUpdated();
 	}
 
-	//only swaps the widgets, which
-	//also means that any changed settings will be discarded
+	/**
+	 * only swaps the widgets, which also means that any changed settings will be discarded
+	 */
 	private void onCancelClicked()
 	{
 		btnMenuPlay.setVisible(true);
 		btnMenuOptions.setVisible(true);
 		winOptions.setVisible(false);
+		AudioManager.instance.onSettingsUpdated();
 	}
 }

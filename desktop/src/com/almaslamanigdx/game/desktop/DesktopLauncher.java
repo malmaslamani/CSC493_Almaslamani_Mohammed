@@ -1,6 +1,6 @@
 package com.almaslamanigdx.game.desktop;
 
-import com.almaslamanigdx.game.CanyonBunnyMain;
+import com.almaslamanigdx.game.AlmaslamaniGdxGame;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
@@ -29,7 +29,7 @@ public class DesktopLauncher
 		cfg.title = "TheMonkeyGame";
 		cfg.width = 800;
 		cfg.height = 480;
-		new LwjglApplication(new CanyonBunnyMain(), cfg);
+		new LwjglApplication(new AlmaslamaniGdxGame(), cfg);
 
 	}
 }

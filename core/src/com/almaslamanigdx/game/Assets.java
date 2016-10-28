@@ -6,6 +6,8 @@ import com.badlogic.gdx.assets.AssetErrorListener;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 
 import util.Constants;
 
@@ -26,14 +28,21 @@ public class Assets implements Disposable, AssetErrorListener
 	public AssetPineApple pineApple;
 	public AssetRock rock;
 	public AssetFonts fonts;
+	public AssetSounds sounds;
+	public AssetMusic music;
 
-	//Singleton: prevent instantiation from other classes 
+	/**
+	 * Singleton: prevent instantiation from other classes 
+	 */
 	private Assets()
 	{
 
 	}
 
-	//this method will load all the assets
+	/**
+	 * this method will load all the assets
+	 * @param assetManager
+	 */
 	public void init (AssetManager assetManager) 
 	{
 		this.assetManager = assetManager;
@@ -43,6 +52,16 @@ public class Assets implements Disposable, AssetErrorListener
 
 		// load texture atlas
 		assetManager.load(Constants.TEXTURE_ATLAS_OBJECTS,TextureAtlas.class);
+		
+		// load sounds
+		assetManager.load("sounds/jump.wav", Sound.class);
+		assetManager.load("sounds/jump_with_pineapple.wav", Sound.class);
+		assetManager.load("sounds/eatBanana.wav", Sound.class);
+		assetManager.load("sounds/eatBanana.wav", Sound.class);
+		assetManager.load("sounds/live_lost.wav", Sound.class);
+		
+		// load music
+		assetManager.load("music/HungerGames.mp3",Music.class);
 
 		// start loading assets and wait until finished
 		assetManager.finishLoading();
@@ -72,7 +91,9 @@ public class Assets implements Disposable, AssetErrorListener
 		pineApple = new AssetPineApple(atlas);
 		rock = new AssetRock(atlas);
 		
-
+		//tell the asset manager to load and manage every sound and music file
+		sounds = new AssetSounds(assetManager);
+		music = new AssetMusic(assetManager);
 	}
 
 
@@ -93,9 +114,11 @@ public class Assets implements Disposable, AssetErrorListener
 
 
 
-	//The constructor takes a reference of the corresponding
-	//atlas in which it will find the atlas region it wants.
-	//this class contains monkey asset
+	/**
+	 * The constructor takes a reference of the corresponding atlas in which
+	 * it will find the atlas region it wants. 
+	 * this class contains monkey asset
+	 */
 	public class AssetMonkey
 	{
 		public final AtlasRegion monkey;
@@ -105,7 +128,9 @@ public class Assets implements Disposable, AssetErrorListener
 		}
 	}
 
-	//this class contains rock assets
+	/**
+	 * this class contains rock assets
+	 */
 	public class AssetRock 
 	{
 		public final AtlasRegion edge;
@@ -117,7 +142,9 @@ public class Assets implements Disposable, AssetErrorListener
 		}
 	}
 
-	//this class contains banana asset
+	/**
+	 * this class contains banana asset
+	 */
 	public class AssetBanana
 	{
 		public final AtlasRegion banana;
@@ -127,7 +154,9 @@ public class Assets implements Disposable, AssetErrorListener
 		}
 	}
 
-	//this class contains banana asset
+	/**
+	 * this class contains banana asset
+	 */
 	public class AssetPineApple
 	{
 		public final AtlasRegion pineApple;
@@ -138,8 +167,9 @@ public class Assets implements Disposable, AssetErrorListener
 	}
 
 
-	//this class contains all the
-	//decorative images that only add to the look and feel of the level
+	/**
+	 * this class contains all the decorative images that only add to the look and feel of the level
+	 */
 	public class AssetLevelDecoration
 	{
 		public final AtlasRegion cloud01;
@@ -167,7 +197,7 @@ public class Assets implements Disposable, AssetErrorListener
 		public final BitmapFont defaultBig;
 		public AssetFonts () 
 		{
-			
+
 			// create three fonts using Libgdx's 15px bitmap font
 			defaultSmall = new BitmapFont(
 					Gdx.files.internal("images/arial-15.fnt"), true);
@@ -175,12 +205,12 @@ public class Assets implements Disposable, AssetErrorListener
 					Gdx.files.internal("images/arial-15.fnt"), true);
 			defaultBig = new BitmapFont(
 					Gdx.files.internal("images/arial-15.fnt"), true);
-			
+
 			// set font sizes
 			defaultSmall.getData().setScale(0.75f);
 			defaultNormal.getData().setScale(1.0f);
 			defaultBig.getData().setScale(2.0f);
-			
+
 			// enable linear texture filtering for smooth fonts
 			defaultSmall.getRegion().getTexture().setFilter(
 					TextureFilter.Linear, TextureFilter.Linear);
@@ -188,6 +218,37 @@ public class Assets implements Disposable, AssetErrorListener
 					TextureFilter.Linear, TextureFilter.Linear);
 			defaultBig.getRegion().getTexture().setFilter(
 					TextureFilter.Linear, TextureFilter.Linear);
+		}
+	}
+
+	/**
+	 * will hold the loaded instances of sound effects
+	 */
+	public class AssetSounds 
+	{
+		public final Sound jump;
+		public final Sound jumpWithPineapple;
+		public final Sound eatBanana;
+		public final Sound eatPineapple;
+		public final Sound liveLost;
+		public AssetSounds (AssetManager am) 
+		{
+			jump = am.get("sounds/jump.wav", Sound.class);
+			jumpWithPineapple = am.get("sounds/jump_with_pineapple.wav",Sound.class);
+			eatBanana = am.get("sounds/eatBanana.wav", Sound.class);
+			eatPineapple = am.get("sounds/eatBanana.wav",Sound.class);
+			liveLost = am.get("sounds/live_lost.wav", Sound.class);
+		}
+	}
+
+	/**will hold the loaded instances of the music effects
+	 */
+	public class AssetMusic 
+	{
+		public final Music song01;
+		public AssetMusic (AssetManager am) 
+		{
+			song01 = am.get("music/HungerGames.mp3",Music.class);
 		}
 	}
 

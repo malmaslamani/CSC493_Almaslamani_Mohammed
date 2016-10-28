@@ -68,8 +68,10 @@ public class Mountains extends AbstractGameObject
 		batch.setColor(1, 1, 1, 1);
 	}
 
-	// shift mountain and extend length
-	//describes the distance and its scrolling speed (the 5th parameter)
+	/**
+	 * shift mountain and extend length describes the distance 
+	 * and its scrolling speed (the 5th parameter)
+	 */
 	@Override
 	public void render (SpriteBatch batch) 
 	{

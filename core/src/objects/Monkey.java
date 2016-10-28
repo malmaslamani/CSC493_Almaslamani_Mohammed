@@ -2,8 +2,11 @@ package objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+
+import util.AudioManager;
 import util.CharacterSkin;
 import util.Constants;
 import util.GamePreferences;
@@ -39,9 +42,11 @@ public class Monkey extends AbstractGameObject
 		init();
 	}
 
-	//initializes the monkey game object by setting its physics
-	//values, a starting view direction, and jump state. It also deactivates the pineapple
-	//power-up effect.
+	/**
+	 * initializes the monkey game object by setting its physics values,
+	 *  a starting view direction, and jump state. 
+	 *  It also deactivates the pineapple power-up effect.
+	 */
 	public void init () 
 	{
 		dimension.set(1, 1);
@@ -76,9 +81,12 @@ public class Monkey extends AbstractGameObject
 
 	}
 
-	//allows us to make the monkey jump. The state handling in the
-	//code will decide whether jumping is currently possible and whether it is a single or a
-	//multi jump.
+	/**
+	 * allows us to make the monkey jump. 
+	 * The state handling in the code will decide whether jumping is currently possible 
+	 * and whether it is a single or a multi jump.
+	 * @param jumpKeyPressed
+	 */
 	public void setJumping (boolean jumpKeyPressed) 
 	{
 		switch (jumpState) 
@@ -87,6 +95,9 @@ public class Monkey extends AbstractGameObject
 
 			if (jumpKeyPressed) 
 			{
+				//play jump sound 
+				AudioManager.instance.play(Assets.instance.sounds.jump);
+				
 				// Start counting jump time from the beginning
 				timeJumping = 0;
 				jumpState = JUMP_STATE.JUMP_RISING;
@@ -104,6 +115,7 @@ public class Monkey extends AbstractGameObject
 
 			if (jumpKeyPressed && hasPineApplePowerup) 
 			{
+				AudioManager.instance.play(Assets.instance.sounds.jumpWithPineapple, 1,MathUtils.random(1.0f, 1.1f));
 				timeJumping = JUMP_TIME_OFFSET_FLYING;
 				//jumpState = JUMP_STATE.JUMP_RISING;
 			}
@@ -121,7 +133,9 @@ public class Monkey extends AbstractGameObject
 		}	
 	}
 
-	//find out whether the power-up is still active.
+	/**
+	 * find out whether the power-up is still active.
+	 */
 	public boolean hasPineApplePowerup () 
 	{
 		return hasPineApplePowerup && timeLeftPineApplePowerup > 0;
@@ -152,8 +166,9 @@ public class Monkey extends AbstractGameObject
 		dustParticles.update(deltaTime);
 	}
 
-	//handles the calculations and switching of states that is needed to
-	//enable jumping and falling.
+	/**
+	 * handles the calculations and switching of states that is needed to enable jumping and falling.
+	 */
 	@Override
 	protected void updateMotionY (float deltaTime) 
 	{
@@ -206,8 +221,9 @@ public class Monkey extends AbstractGameObject
 		}
 
 
-		//drawing of the image for the monkey game
-		//object. The image will be tinted orange if the PineApple power-up effect is active.
+		/**
+		 * drawing of the image for the monkey game object. The image will be tinted orange if the PineApple power-up effect is active.
+		 */
 		@Override
 		public void render(SpriteBatch batch) 
 		{

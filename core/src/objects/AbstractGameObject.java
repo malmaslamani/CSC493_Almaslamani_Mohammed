@@ -45,8 +45,11 @@ public abstract class AbstractGameObject
 
 	public abstract void render (SpriteBatch batch);
 
-	//called on every update cycle to calculate the next x and y components of the object's velocity in terms
-	//of the given delta time
+	/**
+	 * called on every update cycle to calculate the next x and y 
+	 * components of the object's velocity in terms of the given delta time
+	 * @param deltaTime
+	 */
 	protected void updateMotionX (float deltaTime) 
 	{
 		if (velocity.x != 0) 
