@@ -34,9 +34,11 @@ public class GameScreen extends AbstractGameScreen
 		}
 
 		// Sets the clear screen color to: Cornflower Blue
-		Gdx.gl.glClearColor(0x64 / 255.0f, 0x95 / 255.0f,0xed /
-				255.0f, 0xff / 255.0f);
-
+		//Gdx.gl.glClearColor(0x64 / 255.0f, 0x95 / 255.0f,0xed /255.0f, 0xff / 255.0f);
+		
+		// Sets the clear screen color to: pink
+		Gdx.gl.glClearColor(1.0f, .8f, .667f, 1);
+		
 		// Clears the screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

@@ -26,7 +26,7 @@ public class DesktopLauncher
 		}
 
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
-		cfg.title = "TheMonkeyGame";
+		cfg.title = "Lula'sMonkeyGame";
 		cfg.width = 800;
 		cfg.height = 480;
 		new LwjglApplication(new AlmaslamaniGdxGame(), cfg);

@@ -1,9 +1,15 @@
 package objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 
 import util.AudioManager;
@@ -20,7 +26,8 @@ public class Monkey extends AbstractGameObject
 	private final float JUMP_TIME_MIN = 0.1f;
 	private final float JUMP_TIME_OFFSET_FLYING = JUMP_TIME_MAX - 0.018f;
 	public ParticleEffect dustParticles = new ParticleEffect();
-
+	
+	
 	public enum VIEW_DIRECTION 
 	{ 
 		LEFT, RIGHT 
@@ -49,6 +56,7 @@ public class Monkey extends AbstractGameObject
 	 */
 	public void init () 
 	{
+		
 		dimension.set(1, 1);
 		regMonkey = Assets.instance.monkey.monkey;
 
@@ -154,7 +162,7 @@ public class Monkey extends AbstractGameObject
 		if (timeLeftPineApplePowerup > 0) 
 		{
 			timeLeftPineApplePowerup -= deltaTime;
-			position.x += 2*velocity.x * deltaTime;//double the speed when hasPineApple (Assignment 6 C)
+			position.x += 1.5 * velocity.x * deltaTime;//double the speed when hasPineApple (Assignment 6 C)// brought it back to 1.5 becuz it was too fast
 
 			if (timeLeftPineApplePowerup < 0) 
 			{
@@ -252,9 +260,10 @@ public class Monkey extends AbstractGameObject
 					reg.getRegionX(), reg.getRegionY(), reg.getRegionWidth(),
 					reg.getRegionHeight(), viewDirection == VIEW_DIRECTION.LEFT,
 					false);// I did position.y-0.5f because the monkey was drawn floating in the air
-
+			
 			// Reset color to white
 			batch.setColor(1, 1, 1, 1);
+			
 		}
 
 	}
