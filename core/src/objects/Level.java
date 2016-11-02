@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import objects.Goal;
+import objects.Carrot;
 
 public class Level 
 {
@@ -11,6 +13,8 @@ public class Level
 	public BunnyHead bunnyHead;
 	public Array<GoldCoin> goldcoins;
 	public Array<Feather> feathers;
+	public Array<Carrot> carrots;
+	public Goal goal;
 
 	//to represent our entire game world objects.
 	public enum BLOCK_TYPE 
@@ -19,6 +23,7 @@ public class Level
 		ROCK(0, 255, 0), // green
 		PLAYER_SPAWNPOINT(255, 255, 255), // white
 		ITEM_FEATHER(255, 0, 255), // purple
+		GOAL(255, 0, 0), // red
 		ITEM_GOLD_COIN(255, 255, 0); // yellow
 
 
@@ -65,10 +70,11 @@ public class Level
 		// player character
 		bunnyHead = null;
 
+		//objects
 		rocks = new Array<Rock>();
-
 		goldcoins = new Array<GoldCoin>();
 		feathers = new Array<Feather>();
+		carrots = new Array<Carrot>();
 
 		// load image file that represents the level data
 		Pixmap pixmap = new Pixmap(Gdx.files.internal(filename));
@@ -147,78 +153,97 @@ public class Level
 					goldcoins.add((GoldCoin)obj);
 				}
 
-				// unknown object/pixel color
-				else 
+				// goal
+				else if (BLOCK_TYPE.GOAL.sameColor(currentPixel)) 
 				{
-					int r = 0xff & (currentPixel >>> 24); //red color channel
-					int g = 0xff & (currentPixel >>> 16); //green color channel
-					int b = 0xff & (currentPixel >>> 8); //blue color channel
-					int a = 0xff & currentPixel; //alpha channel
-					Gdx.app.error(TAG, "Unknown object at x<" + pixelX + "> y<"
-							+ pixelY + ">: r<" + r+ "> g<" + g + "> b<" + b + "> a<" + a + ">");
+					obj = new Goal();
+					offsetHeight = -7.0f;
+					obj.position.set(pixelX, baseHeight + offsetHeight);
+					goal = (Goal)obj;
 				}
-				lastPixel = currentPixel;
+
+					// unknown object/pixel color
+					else 
+					{
+						int r = 0xff & (currentPixel >>> 24); //red color channel
+						int g = 0xff & (currentPixel >>> 16); //green color channel
+						int b = 0xff & (currentPixel >>> 8); //blue color channel
+						int a = 0xff & currentPixel; //alpha channel
+						Gdx.app.error(TAG, "Unknown object at x<" + pixelX + "> y<"
+								+ pixelY + ">: r<" + r+ "> g<" + g + "> b<" + b + "> a<" + a + ">");
+					}
+					lastPixel = currentPixel;
+				}
 			}
+
+			// decoration
+			clouds = new Clouds(pixmap.getWidth());
+			clouds.position.set(0, 2);
+			mountains = new Mountains(pixmap.getWidth());
+			mountains.position.set(-1, -1);
+			waterOverlay = new WaterOverlay(pixmap.getWidth());
+			waterOverlay.position.set(0, -3.75f);
+
+			// free memory
+			pixmap.dispose();
+			Gdx.app.debug(TAG, "level '" + filename + "' loaded");
+
 		}
 
-		// decoration
-		clouds = new Clouds(pixmap.getWidth());
-		clouds.position.set(0, 2);
-		mountains = new Mountains(pixmap.getWidth());
-		mountains.position.set(-1, -1);
-		waterOverlay = new WaterOverlay(pixmap.getWidth());
-		waterOverlay.position.set(0, -3.75f);
-
-		// free memory
-		pixmap.dispose();
-		Gdx.app.debug(TAG, "level '" + filename + "' loaded");
-
-	}
-
-	//it must be in order to avoid something being behind another
-	public void render (SpriteBatch batch) 
-	{
-		// Draw Mountains
-		mountains.render(batch);
-
-		// Draw Water Overlay
-		waterOverlay.render(batch);
-
-		// Draw Rocks
-		for (Rock rock : rocks)
+		//it must be in order to avoid something being behind another
+		public void render (SpriteBatch batch) 
 		{
-			rock.render(batch);
+			// Draw Mountains
+			mountains.render(batch);
+			
+			// Draw Goal
+			goal.render(batch);
 
+			// Draw Water Overlay
+			waterOverlay.render(batch);
+
+			// Draw Rocks
+			for (Rock rock : rocks)
+			{
+				rock.render(batch);
+
+			}
+
+			// Draw Gold Coins
+			for (GoldCoin goldCoin : goldcoins)
+				goldCoin.render(batch);
+
+			// Draw Feathers
+			for (Feather feather : feathers)
+				feather.render(batch);
+
+			// Draw Player Character
+			bunnyHead.render(batch);
+			
+			// Draw Carrots
+			for (Carrot carrot : carrots)
+			carrot.render(batch);
+
+			// Draw Clouds
+			clouds.render(batch);
 		}
 
-		// Draw Gold Coins
-		for (GoldCoin goldCoin : goldcoins)
-			goldCoin.render(batch);
+		public void update (float deltaTime) 
+		{
+			bunnyHead.update(deltaTime);
 
-		// Draw Feathers
-		for (Feather feather : feathers)
-			feather.render(batch);
+			for(Rock rock : rocks)
+				rock.update(deltaTime);
 
-		// Draw Player Character
-		bunnyHead.render(batch);
+			for(GoldCoin goldCoin : goldcoins)
+				goldCoin.update(deltaTime);
 
-		// Draw Clouds
-		clouds.render(batch);
+			for(Feather feather : feathers)
+				feather.update(deltaTime);
+			
+			for (Carrot carrot : carrots)
+				carrot. update(deltaTime);
+
+			clouds.update(deltaTime);
+		}
 	}
-
-	public void update (float deltaTime) 
-	{
-		bunnyHead.update(deltaTime);
-		
-		for(Rock rock : rocks)
-			rock.update(deltaTime);
-		
-		for(GoldCoin goldCoin : goldcoins)
-			goldCoin.update(deltaTime);
-		
-		for(Feather feather : feathers)
-			feather.update(deltaTime);
-		
-		clouds.update(deltaTime);
-	}
-}

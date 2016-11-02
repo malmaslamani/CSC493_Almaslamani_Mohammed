@@ -102,20 +102,21 @@ public class Rock extends AbstractGameObject
 	public void update (float deltaTime) 
 	{
 		super.update(deltaTime);
-		
+
 		//used to store the next target position
 		floatCycleTimeLeft -= deltaTime;
-		
-		if (floatTargetPosition == null)
-			floatTargetPosition = new Vector2(position);
-		
+
 		if (floatCycleTimeLeft<= 0) 
 		{
 			floatCycleTimeLeft = FLOAT_CYCLE_TIME;
 			floatingDownwards = !floatingDownwards;
-			floatTargetPosition.y += FLOAT_AMPLITUDE* (floatingDownwards ? -1 : 1);
+			body.setLinearVelocity(0, FLOAT_AMPLITUDE* (floatingDownwards ? -1 : 1));
 		}
-		position.lerp(floatTargetPosition, deltaTime);
+		else 
+		{
+			body.setLinearVelocity(body.getLinearVelocity().scl(0.98f));
+			//position.lerp(floatTargetPosition, deltaTime);
+		}
 	}
 
 }

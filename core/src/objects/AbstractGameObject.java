@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.physics.box2d.Body;
 
 //This class is able to store the position, dimension, origin, scale factor, and angle
 //of rotation of a game object.
@@ -21,6 +22,8 @@ public abstract class AbstractGameObject
 	public Vector2 friction;
 	public Vector2 acceleration;
 	public Rectangle bounds;
+
+	public Body body;
 
 	public AbstractGameObject () 
 	{
@@ -43,20 +46,30 @@ public abstract class AbstractGameObject
 	}
 
 	//will be called inside our world controller
+	//The idea here is that each game object will be using our simple physics as long as
+	//there is no Box2D body defined in the body variable.
 	public void update(float deltaTime)
 	{
-		updateMotionX(deltaTime);
-		updateMotionY(deltaTime);
-		
-		// Move to new position
-		position.x += velocity.x * deltaTime;
-		position.y += velocity.y * deltaTime;
+		if (body == null) 
+		{
+			updateMotionX(deltaTime);
+			updateMotionY(deltaTime);
+
+			// Move to new position
+			position.x += velocity.x * deltaTime;
+			position.y += velocity.y * deltaTime;
+		}
+		else 
+		{
+			position.set(body.getPosition());
+			rotation = body.getAngle() * MathUtils.radiansToDegrees;
+		}
 	}
-	
+
 	//will be called inside our world renderer
 	public abstract void render(SpriteBatch batch);
 
-	
+
 	//simple physics simulation code that makes use of the new physics attributes
 	//calculate the next x component of the object's velocity in terms
 	//of the given delta time.
@@ -64,7 +77,7 @@ public abstract class AbstractGameObject
 	{
 		if (velocity.x != 0) 
 		{
-		
+
 			// Apply friction
 			if (velocity.x > 0) 
 			{
@@ -75,15 +88,15 @@ public abstract class AbstractGameObject
 				velocity.x =Math.min(velocity.x + friction.x * deltaTime, 0);
 			}
 		}
-		
+
 		// Apply acceleration
 		velocity.x += acceleration.x * deltaTime;
-		
+
 		// Make sure the object's velocity does not exceed the
 		// positive or negative terminal velocity
 		velocity.x = MathUtils.clamp(velocity.x,-terminalVelocity.x, terminalVelocity.x);
 	}
-	
+
 	//calculate the next y component of the object's velocity in terms
 	//of the given delta time.
 	protected void updateMotionY (float deltaTime) 
@@ -100,10 +113,10 @@ public abstract class AbstractGameObject
 				velocity.y = Math.min(velocity.y + friction.y *deltaTime, 0);
 			}
 		}
-	
+
 		// Apply acceleration
 		velocity.y += acceleration.y * deltaTime;
-		
+
 		// Make sure the object's velocity does not exceed the
 		// positive or negative terminal velocity
 		velocity.y = MathUtils.clamp(velocity.y, -terminalVelocity.y, terminalVelocity.y);

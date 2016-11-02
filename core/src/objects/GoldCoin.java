@@ -5,9 +5,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.almaslamanigdx.game.Assets;
 
 
-//can be collected by the player's character by simply walking over it. As
-//a result of the gold coin being collected, the object will turn invisible for the rest of
-//the game.
+/**
+ * can be collected by the player's character by simply walking over it. As
+ * a result of the gold coin being collected, the object will turn invisible for the rest of
+ * the game.
+ *
+ */
 public class GoldCoin extends AbstractGameObject 
 {
 
