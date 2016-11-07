@@ -547,8 +547,8 @@ public class WorldController extends InputAdapter implements Disposable
 	@Override
 	public void dispose () 
 	{
-		if (b2world != null) 
-			b2world.dispose();
+		//if (b2world != null) 
+			//b2world.dispose();
 	}
 }
 
