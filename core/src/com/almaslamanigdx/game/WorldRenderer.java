@@ -9,6 +9,7 @@ import util.GamePreferences;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 public class WorldRenderer implements Disposable
 {
@@ -23,6 +24,10 @@ public class WorldRenderer implements Disposable
 	//this class is the actual workhorse that draws all our objects with respect to the
 	//camera's current settings (for example, position, zoom, and so on) to the screen.
 	private SpriteBatch batch;
+	
+	// For Box2D Debugging
+	private static final boolean DEBUG_DRAW_BOX2D_WORLD = true;
+	private Box2DDebugRenderer b2DebugRenderer;
 
 	//needed to render all the game objects that managed by the controller.
 	private WorldController worldController;
@@ -46,6 +51,9 @@ public class WorldRenderer implements Disposable
 		cameraGUI.position.set(0, 0, 0);
 		cameraGUI.setToOrtho(true); // flip y-axis
 		cameraGUI.update();
+		
+		b2DebugRenderer = new Box2DDebugRenderer();
+
 	}
 
 	public void render()
@@ -61,6 +69,11 @@ public class WorldRenderer implements Disposable
 		batch.begin();
 		worldController.level.render(batch);
 		batch.end();
+		
+		if (DEBUG_DRAW_BOX2D_WORLD)
+		{
+			b2DebugRenderer.render(worldController.myWorld, camera.combined);
+		}
 	}
 
 	public void resize(int width, int height)

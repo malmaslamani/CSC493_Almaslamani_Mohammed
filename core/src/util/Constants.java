@@ -40,4 +40,8 @@ public class Constants
 
 	public static final String PREFERENCES = "canyonbunny.prefs";
 
+	public static final int BLOCKS_SPAWN_MAX = 1;
+
+	public static final float BLOCKS_SPAWN_RADIUS = 1.5f;
+
 }
