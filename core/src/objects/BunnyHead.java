@@ -5,12 +5,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-
 import util.AudioManager;
 import util.CharacterSkin;
 import util.Constants;
 import util.GamePreferences;
 import com.almaslamanigdx.game.Assets;
+import com.badlogic.gdx.graphics.g2d.Animation;
 
 public class BunnyHead extends AbstractGameObject
 {
@@ -24,6 +24,19 @@ public class BunnyHead extends AbstractGameObject
 	//fire dust particle effect.
 	public ParticleEffect dustParticles = new ParticleEffect();
 
+	private TextureRegion regHead;
+	public VIEW_DIRECTION viewDirection;
+	public float timeJumping;
+	public JUMP_STATE jumpState;
+	public boolean hasFeatherPowerup;
+	public float timeLeftFeatherPowerup;
+
+	//Animations
+	private Animation animNormal;
+	private Animation animCopterTransform;
+	private Animation animCopterTransformBack;
+	private Animation animCopterRotate;
+
 	//defined the viewing direction—a state for jumping and another
 	//state for the feather power-up
 	public enum VIEW_DIRECTION 
@@ -36,25 +49,29 @@ public class BunnyHead extends AbstractGameObject
 		GROUNDED, FALLING, JUMP_RISING, JUMP_FALLING
 	}
 
-	private TextureRegion regHead;
-	public VIEW_DIRECTION viewDirection;
-	public float timeJumping;
-	public JUMP_STATE jumpState;
-	public boolean hasFeatherPowerup;
-	public float timeLeftFeatherPowerup;
 
 	public BunnyHead () 
 	{
 		init();
 	}
 
-	//initializes the bunny head game object by setting its physics
-	//values, a starting view direction, and jump state. It also deactivates the feather
-	//power-up effect.
+	/**
+	 * initializes the bunny head game object by setting its physics
+	 * values, a starting view direction, and jump state. It also deactivates the feather
+	 * power-up effect.
+	 */
 	public void init () 
 	{
 		dimension.set(1, 1);
-		regHead = Assets.instance.bunny.head;
+
+		//we store the references of every animation we are going to
+		//use in the corresponding local variables for much shorter names
+		animNormal = Assets.instance.bunny.animNormal;
+		animCopterTransform = Assets.instance.bunny.animCopterTransform;
+		animCopterTransformBack =
+				Assets.instance.bunny.animCopterTransformBack;
+		animCopterRotate = Assets.instance.bunny.animCopterRotate;
+		setAnimation(animNormal);
 
 		// Center image on game object
 		origin.set(dimension.x / 2, dimension.y / 2);
@@ -84,9 +101,12 @@ public class BunnyHead extends AbstractGameObject
 	}
 
 
-	//The state handling in the
-	//code will decide whether jumping is currently possible and whether it is a single or a
-	//multi jump.
+
+	/**
+	 * The state handling in the
+	 * code will decide whether jumping is currently possible and whether it is a single or a
+	 * multi jump.
+	 **/
 	public void setJumping (boolean jumpKeyPressed) 
 	{
 		switch (jumpState) 
@@ -96,7 +116,7 @@ public class BunnyHead extends AbstractGameObject
 			{
 				//play the audio associated with jumping 
 				AudioManager.instance.play(Assets.instance.sounds.jump);
-				
+
 				// Start counting jump time from the beginning
 				timeJumping = 0;
 				jumpState = JUMP_STATE.JUMP_RISING;
@@ -155,19 +175,27 @@ public class BunnyHead extends AbstractGameObject
 		// Apply Skin Color
 		batch.setColor(CharacterSkin.values()[GamePreferences.instance.charSkin].getColor());
 
-		// Set special color when game object has a feather power-up
-		if (hasFeatherPowerup) 
+		float dimCorrectionX = 0;
+		float dimCorrectionY = 0;
+		if (animation != animNormal) 
 		{
-			batch.setColor(1.0f, 0.8f, 0.0f, 1.0f);
+			dimCorrectionX = 0.05f;
+			dimCorrectionY = 0.2f;
 		}
 
 		// Draw image
-		reg = regHead;
-		batch.draw(reg.getTexture(), position.x, position.y, origin.x,
-				origin.y, dimension.x, dimension.y, scale.x, scale.y, rotation,
-				reg.getRegionX(), reg.getRegionY(), reg.getRegionWidth(),
-				reg.getRegionHeight(), viewDirection == VIEW_DIRECTION.LEFT,
-				false);
+		reg = animation.getKeyFrame(stateTime, true);
+
+		batch.draw(reg.getTexture(),
+				position.x, position.y,
+				origin.x, origin.y,
+				dimension.x + dimCorrectionX,
+				dimension.y + dimCorrectionY,
+				scale.x, scale.y,
+				rotation,
+				reg.getRegionX(), reg.getRegionY(),
+				reg.getRegionWidth(), reg.getRegionHeight(),
+				viewDirection == VIEW_DIRECTION.LEFT, false);
 
 		// Reset color to white
 		batch.setColor(1, 1, 1, 1);
@@ -190,17 +218,53 @@ public class BunnyHead extends AbstractGameObject
 
 		if (timeLeftFeatherPowerup > 0) 
 		{
-			timeLeftFeatherPowerup -= deltaTime;
+			if (animation == animCopterTransformBack) 
+			{
+				// Restart "Transform" animation if another feather power-up
+				// was picked up during "TransformBack" animation. Otherwise,
+				// the "TransformBack" animation would be stuck while the
+				// power-up is still active.
+				setAnimation(animCopterTransform);
+			}
 
+			timeLeftFeatherPowerup -= deltaTime;
 			if (timeLeftFeatherPowerup < 0) 
 			{
 				// disable power-up
 				timeLeftFeatherPowerup = 0;
 				setFeatherPowerup(false);
+
+				setAnimation(animCopterTransformBack);
 			}
 		}
 		dustParticles.update(deltaTime);
 
+		// Change animation state according to feather power-up
+		if (hasFeatherPowerup) 
+		{
+			if (animation == animNormal) 
+			{
+				setAnimation(animCopterTransform);
+			} 
+			else if (animation == animCopterTransform) 
+			{
+				if (animation.isAnimationFinished(stateTime))
+					setAnimation(animCopterRotate);
+			}
+		} 
+		else 
+		{
+			if (animation == animCopterRotate) 
+			{
+				if (animation.isAnimationFinished(stateTime))
+					setAnimation(animCopterTransformBack);
+			} 
+			else if (animation == animCopterTransformBack) 
+			{
+				if (animation.isAnimationFinished(stateTime))
+					setAnimation(animNormal);
+			}
+		}
 	}
 
 	//handles the calculations and switching of states that is needed to
@@ -212,7 +276,7 @@ public class BunnyHead extends AbstractGameObject
 		{
 		case GROUNDED:
 			jumpState = JUMP_STATE.FALLING;
-			
+
 			//when moving, the dust will be drawn 
 			if (velocity.x != 0) 
 			{

@@ -26,6 +26,10 @@ import util.Constants;
 import util.GamePreferences;
 import com.almaslamanigdx.game.Assets;
 import util.AudioManager;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 
 public class MenuScreen extends AbstractGameScreen
 {
@@ -51,7 +55,7 @@ public class MenuScreen extends AbstractGameScreen
 	private SelectBox<CharacterSkin> selCharSkin;
 	private Image imgCharSkin;
 	private CheckBox chkShowFpsCounter;
-	
+
 	// debug
 	private final float DEBUG_REBUILD_INTERVAL = 5.0f;
 	private boolean debugEnabled = false;
@@ -64,8 +68,9 @@ public class MenuScreen extends AbstractGameScreen
 		super(game);
 	}
 
-	//we build everything that will make up the final scene of our
-	//menu screen.
+	/**
+	 * we build everything that will make up the final scene of our menu screen.
+	 */
 	private void rebuildStage () 
 	{
 		skinCanyonBunny = new Skin(Gdx.files.internal(Constants.SKIN_CANYONBUNNY_UI),
@@ -93,7 +98,10 @@ public class MenuScreen extends AbstractGameScreen
 		stage.addActor(layerOptionsWindow);
 	}
 
-	//to add the bkground layer
+	/**
+	 * to add the bkground layer
+	 * @return
+	 */
 	private Table buildBackgroundLayer () 
 	{
 		Table layer = new Table();
@@ -111,21 +119,35 @@ public class MenuScreen extends AbstractGameScreen
 	{
 		Table layer = new Table();
 
-		// + Coins
+		// + Coins.. added animations for the coins in the background
 		imgCoins = new Image(skinCanyonBunny, "coins");
 		layer.addActor(imgCoins);
-		imgCoins.setPosition(135, 80);
+		imgCoins.setOrigin(imgCoins.getWidth() / 2,imgCoins.getHeight() / 2);
+		imgCoins.addAction(sequence(
+				moveTo(135, -20),
+				scaleTo(0, 0),
+				fadeOut(0),
+				delay(2.5f),
+				parallel(moveBy(0, 100, 0.5f, Interpolation.swingOut),
+						scaleTo(1.0f, 1.0f, 0.25f, Interpolation.linear),
+						alpha(1.0f, 0.5f))));
 
 		// + Bunny
 		imgBunny = new Image(skinCanyonBunny, "bunny");
 		layer.addActor(imgBunny);
-		imgBunny.setPosition(355, 40);
+		imgBunny.addAction(sequence(
+				moveTo(655, 510),
+				delay(4.0f),
+				moveBy(-70, -100, 0.5f, Interpolation.fade),
+				moveBy(-100, -50, 0.5f, Interpolation.fade),
+				moveBy(-150, -300, 1.0f, Interpolation.elasticIn)));
 		return layer;
 	}
 
-	//the top-left corner of the screen.
-	//add method-TableLayout will add a new column,which means the widget grows in a horizontal direction
-	//expandY() method -expands the empty space in a vertical direction.
+	/**the top-left corner of the screen.
+	*add method-TableLayout will add a new column,which means the widget grows in a horizontal direction
+	*expandY() method -expands the empty space in a vertical direction.
+	*/
 	private Table buildLogosLayer () 
 	{
 		Table layer = new Table();
@@ -149,10 +171,12 @@ public class MenuScreen extends AbstractGameScreen
 		return layer;
 	}
 
-	//the bottom-right corner of the screen. A new button
-	//widget is added using the Play style.
-	//ChangeListener is added to this
-	//button to define the action to be executed when the button is clicked on.
+	/**
+	 * the bottom-right corner of the screen. A new button
+	 *widget is added using the Play style.
+	 *ChangeListener is added to this
+	 *button to define the action to be executed when the button is clicked on.
+	*/
 	private Table buildControlsLayer () 
 	{
 		Table layer = new Table();
@@ -190,43 +214,48 @@ public class MenuScreen extends AbstractGameScreen
 		return layer;
 	}
 
-	//initializes the Options window. It builds each part of the menu using the build methods
-	//80% opacity (transparent)
+	/**
+	 * initializes the Options window. It builds each part of the menu using the build methods
+	 * 80% opacity (transparent)
+	 */
 	private Table buildOptionsWindowLayer () 
 	{
 		winOptions = new Window("Options", skinLibgdx);
-		
+
 		// + Audio Settings: Sound/Music CheckBox and Volume Slider
 		winOptions.add(buildOptWinAudioSettings()).row();
-		
+
 		// + Character Skin: Selection Box (White, Gray, Brown)
 		winOptions.add(buildOptWinSkinSelection()).row();
-		
+
 		// + Debug: Show FPS Counter
 		winOptions.add(buildOptWinDebug()).row();
-		
+
 		// + Separator and Buttons (Save, Cancel)
 		winOptions.add(buildOptWinButtons()).pad(10, 0, 10, 0);
-		
+
 		// Make options window slightly transparent
 		winOptions.setColor(1, 1, 1, 0.8f);
 		
 		// Hide options window by default
-		winOptions.setVisible(false);
+		showOptionsWindow(false, false);
+
 		if (debugEnabled) 
 			winOptions.debug();
-		
+
 		// Let TableLayout recalculate widget sizes and positions
 		winOptions.pack();
-		
+
 		// Move options window to bottom right corner
 		winOptions.setPosition
 		(Constants.VIEWPORT_GUI_WIDTH - winOptions.getWidth() - 50,50);
-		
+
 		return winOptions;
 	}
 
-	//makes it solid black and checks if it has been touched
+	/**
+	 * makes it solid black and checks if it has been touched
+	 */
 	@Override
 	public void render(float deltaTime) 
 	{
@@ -251,14 +280,18 @@ public class MenuScreen extends AbstractGameScreen
 
 	}
 
-	//sets the viewport size of the stage.
+	/**
+	 * sets the viewport size of the stage.
+	 */
 	@Override
 	public void resize(int width, int height) 
 	{
 		stage.getViewport().update(width, height, true);
 	}
 
-	//initializes the stage
+	/**
+	 * initializes the stage
+	 */
 	@Override
 	public void show() 
 	{
@@ -267,34 +300,41 @@ public class MenuScreen extends AbstractGameScreen
 		rebuildStage();
 	}
 
-	//method will switch to the game screen,
+	/**
+	 * method will switch to the game screen,
+	 */
 	private void onPlayClicked ()
 	{
 		game.setScreen(new GameScreen(game));
 	}
 
-	//allows the Options window to be opened. The settings are
-	//loaded before the Options window is shown so that the widgets will always be
-	//correctly initialized.
+	/**
+	 * allows the Options window to be opened. The settings are
+	 * loaded before the Options window is shown so that the widgets will always be
+	correctly initialized.
+	 */
 	private void onOptionsClicked () 
 	{ 
 		loadSettings();
-		btnMenuPlay.setVisible(false);
-		btnMenuOptions.setVisible(false);
-		winOptions.setVisible(true);
+		showMenuButtons(false);
+		// to be hidden at the start.
+		showOptionsWindow(true, true);
 	}
 
-	
-
-	//will update the preview image.
+	/**
+	 * will update the preview image.
+	 * @param index
+	 */
 	private void onCharSkinSelected(int index) 
 	{
 		CharacterSkin skin = CharacterSkin.values()[index];
 		imgCharSkin.setColor(skin.getColor());
 	}
 
-	//saves the current settings of the Options window and swaps the Options window for the
-	//menu controls.
+	/**
+	 * saves the current settings of the Options window and swaps the Options window for the
+	 * menu controls.
+	 */
 	private void onSaveClicked() 
 	{
 		saveSettings();
@@ -302,13 +342,14 @@ public class MenuScreen extends AbstractGameScreen
 		AudioManager.instance.onSettingsUpdated();
 	}
 
-	//only swaps the widgets, which
-	//also means that any changed settings will be discarded
+	/**
+	 * only swaps the widgets, which
+	 * also means that any changed settings will be discarded
+	 */
 	private void onCancelClicked() 
 	{
-		btnMenuPlay.setVisible(true);
-		btnMenuOptions.setVisible(true);
-		winOptions.setVisible(false);
+		showMenuButtons(true);
+		showOptionsWindow(false, true);
 		AudioManager.instance.onSettingsUpdated();
 	}
 
@@ -357,9 +398,9 @@ public class MenuScreen extends AbstractGameScreen
 
 		// + Drop down box filled with skin items
 		selCharSkin = new SelectBox<CharacterSkin>(skinLibgdx);
-		
+
 		selCharSkin.setItems(CharacterSkin.values());
-		
+
 		selCharSkin.addListener(new ChangeListener() 
 		{
 			@Override
@@ -447,7 +488,10 @@ public class MenuScreen extends AbstractGameScreen
 		});
 		return tbl;
 	}
-	//free the allocated resources when the screen is hidden
+	
+	/**
+	 * free the allocated resources when the screen is hidden
+	 */
 	@Override
 	public void hide() 
 	{
@@ -460,32 +504,77 @@ public class MenuScreen extends AbstractGameScreen
 	{
 
 	}
+
+	/**
+	 * load and save are used to translate back
+	 * 	and forth between the values stored in the widgets and the instance
+	 */
+	private void loadSettings() 
+	{
+		GamePreferences prefs = GamePreferences.instance;
+		prefs.load();
+		chkSound.setChecked(prefs.sound);
+		sldSound.setValue(prefs.volSound);
+		chkMusic.setChecked(prefs.music);
+		sldMusic.setValue(prefs.volMusic);
+		selCharSkin.setSelectedIndex(prefs.charSkin);
+		onCharSkinSelected(prefs.charSkin);
+		chkShowFpsCounter.setChecked(prefs.showFpsCounter);
+	}
+	private void saveSettings() 
+	{
+		GamePreferences prefs = GamePreferences.instance;
+		prefs.sound = chkSound.isChecked();
+		prefs.volSound = sldSound.getValue();
+		prefs.music = chkMusic.isChecked();
+		prefs.volMusic = sldMusic.getValue();
+		prefs.charSkin = selCharSkin.getSelectedIndex();
+		prefs.showFpsCounter = chkShowFpsCounter.isChecked();
+		prefs.save();
+	}
+
+	/**
+	 * will allow us to easily show or hide the menu buttons in an animated fashion.
+	 * @param visible
+	 */
+	private void showMenuButtons (boolean visible) 
+	{
+		float moveDuration = 1.0f;
+		Interpolation moveEasing = Interpolation.swing;
+		float delayOptionsButton = 0.25f;
+		float moveX = 300 * (visible ? -1 : 1);
+		float moveY = 0 * (visible ? -1 : 1);
+		final Touchable touchEnabled = visible ? Touchable.enabled: Touchable.disabled;
+		btnMenuPlay.addAction(moveBy(moveX, moveY, moveDuration, moveEasing));
+		btnMenuOptions.addAction(sequence(delay(delayOptionsButton),moveBy(moveX, moveY, moveDuration, moveEasing)));
+		SequenceAction seq = sequence();
+		
+		if (visible)
+			seq.addAction(delay(delayOptionsButton + moveDuration));
+		
+		seq.addAction(run(new Runnable() 
+		{
+			public void run () 
+			{
+				btnMenuPlay.setTouchable(touchEnabled);
+				btnMenuOptions.setTouchable(touchEnabled);
+			}
+		}));
+		stage.addAction(seq);
+	}
 	
-	//load and save are used to translate back
-		//and forth between the values stored in the widgets and the instance
-		private void loadSettings() 
-		{
-			GamePreferences prefs = GamePreferences.instance;
-			prefs.load();
-			chkSound.setChecked(prefs.sound);
-			sldSound.setValue(prefs.volSound);
-			chkMusic.setChecked(prefs.music);
-			sldMusic.setValue(prefs.volMusic);
-			selCharSkin.setSelectedIndex(prefs.charSkin);
-			onCharSkinSelected(prefs.charSkin);
-			chkShowFpsCounter.setChecked(prefs.showFpsCounter);
-		}
-		private void saveSettings() 
-		{
-			GamePreferences prefs = GamePreferences.instance;
-			prefs.sound = chkSound.isChecked();
-			prefs.volSound = sldSound.getValue();
-			prefs.music = chkMusic.isChecked();
-			prefs.volMusic = sldMusic.getValue();
-			prefs.charSkin = selCharSkin.getSelectedIndex();
-			prefs.showFpsCounter = chkShowFpsCounter.isChecked();
-			prefs.save();
-		}
+	/**
+	 * will allow us to easily show or hide the Options window in an animated fashion. 
+	 * @param visible
+	 * @param animated
+	 */
+	private void showOptionsWindow (boolean visible,boolean animated) 
+	{
+		float alphaTo = visible ? 0.8f : 0.0f;
+		float duration = animated ? 1.0f : 0.0f;
+		Touchable touchEnabled = visible ? Touchable.enabled: Touchable.disabled;
+		winOptions.addAction(sequence(touchable(touchEnabled),alpha(alphaTo, duration)));
+	}
 
 
 }

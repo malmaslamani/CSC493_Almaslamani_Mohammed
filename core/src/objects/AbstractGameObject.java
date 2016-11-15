@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.graphics.g2d.Animation;
 
 //This class is able to store the position, dimension, origin, scale factor, and angle
 //of rotation of a game object.
@@ -23,7 +24,12 @@ public abstract class AbstractGameObject
 	public Vector2 acceleration;
 	public Rectangle bounds;
 
+	//BOX2D
 	public Body body;
+
+	//Animations 
+	public float stateTime;
+	public Animation animation;
 
 	public AbstractGameObject () 
 	{
@@ -50,6 +56,7 @@ public abstract class AbstractGameObject
 	//there is no Box2D body defined in the body variable.
 	public void update(float deltaTime)
 	{
+		stateTime += deltaTime;
 		if (body == null) 
 		{
 			updateMotionX(deltaTime);
@@ -120,5 +127,17 @@ public abstract class AbstractGameObject
 		// Make sure the object's velocity does not exceed the
 		// positive or negative terminal velocity
 		velocity.y = MathUtils.clamp(velocity.y, -terminalVelocity.y, terminalVelocity.y);
+	}
+
+	/**
+	 * allows you to
+	 * change the current animation as well as reset the state time to 0.
+	 * --to start from the beginning.
+	 * @param animation
+	 */
+	public void setAnimation (Animation animation) 
+	{
+		this.animation = animation;
+		stateTime = 0;
 	}
 }
