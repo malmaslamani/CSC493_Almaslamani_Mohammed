@@ -1,5 +1,6 @@
 package objects;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -13,7 +14,7 @@ public abstract class AbstractGameObject
 	public Vector2 origin;
 	public Vector2 scale;
 	public float rotation;
-	
+
 	// Non-Box2D Physics
 	public Vector2 velocity;//the object's current speed in m/s.
 	public Vector2 terminalVelocity;//positive and negative maximum speed in m/s.
@@ -23,10 +24,10 @@ public abstract class AbstractGameObject
 
 	// Box2D Physics
 	public Body body;
-	
+
 	// Animation
-	//public float stateTime;
-	//public Animation animation;
+	public float stateTime;
+	public Animation animation;
 
 
 	public AbstractGameObject () 
@@ -63,23 +64,23 @@ public abstract class AbstractGameObject
 				velocity.x = Math.min(velocity.x + friction.x * deltaTime, 0);
 			}
 		}
-		
+
 		// Apply acceleration
 		velocity.x += acceleration.x * deltaTime;
-		
+
 		// Make sure the object's velocity does not exceed the
 		// positive or negative terminal velocity
 		velocity.x = MathUtils.clamp(velocity.x,-terminalVelocity.x, terminalVelocity.x);
 	}
-	
+
 	public void update (float deltaTime) 
 	{
-		//stateTime += deltaTime; needed for animation ?? or not
+		stateTime += deltaTime;
 		if(body == null)
 		{
 			updateMotionX(deltaTime);
 			updateMotionY(deltaTime);
-			
+
 			// Move to new position
 			position.x += velocity.x * deltaTime;
 			position.y += 2*velocity.y * deltaTime; //doubled (Assignment 6 C)
@@ -89,7 +90,7 @@ public abstract class AbstractGameObject
 			position.set(body.getPosition());
 			rotation = body.getAngle() * MathUtils.radiansToDegrees;
 		}
-		
+
 	}
 
 	public abstract void render (SpriteBatch batch);
@@ -118,5 +119,11 @@ public abstract class AbstractGameObject
 		// Make sure the object's velocity does not exceed the
 		// positive or negative terminal velocity
 		velocity.y = MathUtils.clamp(velocity.y, -terminalVelocity.y, terminalVelocity.y);
+	}
+
+	public void setAnimation (Animation animation) 
+	{
+		this.animation = animation;
+		stateTime = 0;
 	}
 }

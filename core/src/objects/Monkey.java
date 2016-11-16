@@ -7,14 +7,11 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-
 import objects.Monkey.JUMP_STATE;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-
 import util.AudioManager;
 import util.CharacterSkin;
 import util.Constants;
@@ -29,17 +26,6 @@ public class Monkey extends AbstractGameObject
 	private final float JUMP_TIME_MIN = 0.1f;
 	private final float JUMP_TIME_OFFSET_FLYING = JUMP_TIME_MAX - 0.018f;
 	public ParticleEffect dustParticles = new ParticleEffect();
-
-
-	public enum VIEW_DIRECTION 
-	{ 
-		LEFT, RIGHT 
-	}
-	public enum JUMP_STATE 
-	{
-		GROUNDED, FALLING, JUMP_RISING, JUMP_FALLING
-	}
-
 	private TextureRegion regMonkey;
 	public VIEW_DIRECTION viewDirection;
 	public float timeJumping;
@@ -47,6 +33,32 @@ public class Monkey extends AbstractGameObject
 	public boolean hasPineApplePowerup;
 	public float timeLeftPineApplePowerup;
 
+	//Animations
+	private Animation animNormal;
+	private Animation animCopterTransform;
+	private Animation animCopterTransformBack;
+	private Animation animCopterRotate;
+
+	/**
+	 * Directions that the monkey can look at.
+	 */
+	public enum VIEW_DIRECTION 
+	{ 
+		LEFT, RIGHT 
+	}
+
+	/**
+	 * States for the monkey
+	 */
+	public enum JUMP_STATE 
+	{
+		GROUNDED, FALLING, JUMP_RISING, JUMP_FALLING
+	}
+
+
+	/**
+	 * Monkey Constructor.
+	 */
 	public Monkey() 
 	{
 		init();
@@ -61,7 +73,14 @@ public class Monkey extends AbstractGameObject
 	{
 
 		dimension.set(1, 1);
-		regMonkey = Assets.instance.monkey.monkey;
+		//regMonkey = Assets.instance.monkey.monkey;
+
+		animNormal = Assets.instance.monkey.animNormal;
+		animCopterTransform = Assets.instance.monkey.animCopterTransform;
+		animCopterTransformBack =
+				Assets.instance.monkey.animCopterTransformBack;
+		animCopterRotate = Assets.instance.monkey.animCopterRotate;
+		setAnimation(animNormal);
 
 		// Center image on game object
 		origin.set(dimension.x / 2, dimension.y / 2);
@@ -155,7 +174,7 @@ public class Monkey extends AbstractGameObject
 	@Override
 	public void update (float deltaTime) 
 	{
-//		super.update(deltaTime); 
+		//		super.update(deltaTime); 
 		updateMotionX(deltaTime);
 		updateMotionY(deltaTime);
 		if (body != null)
@@ -164,53 +183,88 @@ public class Monkey extends AbstractGameObject
 			position.set(body.getPosition());
 		}
 
-			if (velocity.x != 0) 
-			{
-				viewDirection = velocity.x < 0 ? VIEW_DIRECTION.LEFT :VIEW_DIRECTION.RIGHT;
-			}
+		if (body.getLinearVelocity().x != 0) 
+		{
+			viewDirection = body.getLinearVelocity().x < 0 ? VIEW_DIRECTION.LEFT :VIEW_DIRECTION.RIGHT;
+		}
 
-			if (timeLeftPineApplePowerup > 0) 
+		if (timeLeftPineApplePowerup > 0) 
+		{
+			if (animation == animCopterTransformBack) 
 			{
-				timeLeftPineApplePowerup -= deltaTime;
-				position.x += 1.5 * velocity.x * deltaTime;//double the speed when hasPineApple (Assignment 6 C)// brought it back to 1.5 becuz it was too fast
-
-				if (timeLeftPineApplePowerup < 0) 
-				{
-					// disable power-up
-					timeLeftPineApplePowerup = 0;
-					setPineApplePowerup(false);
-				}
+				// Restart "Transform" animation if another feather power-up
+				// was picked up during "TransformBack" animation. Otherwise,
+				// the "TransformBack" animation would be stuck while the
+				// power-up is still active.
+				setAnimation(animCopterTransform);
 			}
-		
+			timeLeftPineApplePowerup -= deltaTime;
+			body.getPosition().x += 1.5 * velocity.x * deltaTime;//double the speed when hasPineApple (Assignment 6 C)// brought it back to 1.5 becuz it was too fast
+
+			if (timeLeftPineApplePowerup < 0) 
+			{
+				// disable power-up
+				timeLeftPineApplePowerup = 0;
+				setPineApplePowerup(false);
+				setAnimation(animCopterTransformBack);
+			}
+		}
+
 		dustParticles.update(deltaTime);
+
+		// Change animation state according to feather power-up
+		if (hasPineApplePowerup) {
+			if (animation == animNormal) 
+			{
+				setAnimation(animCopterTransform);
+			} 
+			else if (animation == animCopterTransform) 
+			{
+				if (animation.isAnimationFinished(stateTime))
+					setAnimation(animCopterRotate);
+			}
+		} 
+		else 
+		{
+			if (animation == animCopterRotate) 
+			{
+				if (animation.isAnimationFinished(stateTime))
+					setAnimation(animCopterTransformBack);
+			} 
+			else if (animation == animCopterTransformBack)
+			{
+				if (animation.isAnimationFinished(stateTime))
+					setAnimation(animNormal);
+			}
+		}
 	}
 
 	/**
 	 * handles the calculations and switching of states that is needed to enable jumping and falling.
 	 */
 	@Override
-    protected void updateMotionY(float deltaTime)
-    {
+	protected void updateMotionY(float deltaTime)
+	{
 		switch (jumpState)
 		{
-			case GROUNDED:
-				jumpState = JUMP_STATE.FALLING;
-				
-			case JUMP_RISING:
-				timeJumping += deltaTime;
-				if (timeJumping <= JUMP_TIME_MAX)
-				{
-					velocity.y = terminalVelocity.y;
-				}
-				else
-					jumpState = JUMP_STATE.JUMP_FALLING;
-				break;
-			case FALLING:
-				jumpState = JUMP_STATE.GROUNDED;
-				break;
-			case JUMP_FALLING:
-				velocity.y = -terminalVelocity.y;
-				break;
+		case GROUNDED:
+			jumpState = JUMP_STATE.FALLING;
+
+		case JUMP_RISING:
+			timeJumping += deltaTime;
+			if (timeJumping <= JUMP_TIME_MAX)
+			{
+				velocity.y = terminalVelocity.y;
+			}
+			else
+				jumpState = JUMP_STATE.JUMP_FALLING;
+			break;
+		case FALLING:
+			jumpState = JUMP_STATE.GROUNDED;
+			break;
+		case JUMP_FALLING:
+			velocity.y = -terminalVelocity.y;
+			break;
 		}
 		if (jumpState != JUMP_STATE.GROUNDED)
 		{
@@ -218,61 +272,61 @@ public class Monkey extends AbstractGameObject
 			dustParticles.allowCompletion();
 			super.updateMotionY(deltaTime);
 		}
-    }
+	}
 
-//	/**
-//	 * handles the calculations and switching of states that is needed to enable jumping and falling.
-//	 */
-//	@Override
-//	protected void updateMotionY (float deltaTime) 
-//	{
-//		switch (jumpState) 
-//		{
-//		case GROUNDED://the player is standing on a platform.
-//			jumpState = JUMP_STATE.FALLING;
-//
-//			//if moving, dust appear
-//			if (velocity.x != 0) 
-//			{
-//				dustParticles.setPosition(position.x + dimension.x / 2,position.y-.25f);
-//				dustParticles.start();
-//			}
-//			break;
-//
-//		case JUMP_RISING://the player has initiated a jump and is still rising. The maximum jump height has not been reached.
-//			// Keep track of jump time
-//			timeJumping += deltaTime;
-//
-//			// Jump time left?
-//			if (timeJumping <= JUMP_TIME_MAX) 
-//			{
-//				// Still jumping
-//				velocity.y = terminalVelocity.y;
-//			}
-//			break;
-//
-//		case FALLING://the player is falling down.
-//			break;
-//
-//		case JUMP_FALLING://the player is falling down after a previously
-//			//initiated jump. This state is reached either by jumping as long as possible or
-//			//by releasing the jump key earlier than that.
-//
-//			// Add delta times to track jump time
-//			timeJumping += deltaTime;
-//
-//			// Jump to minimal height if jump key was pressed too short
-//			if (timeJumping > 0 && timeJumping <= JUMP_TIME_MIN) 
-//			{
-//				// Still jumping
-//				velocity.y = terminalVelocity.y;
-//			}
-//		}
-//
-//		if (jumpState != JUMP_STATE.GROUNDED)
-//			dustParticles.allowCompletion();
-//		super.updateMotionY(deltaTime);
-//	}
+	//	/**
+	//	 * handles the calculations and switching of states that is needed to enable jumping and falling.
+	//	 */
+	//	@Override
+	//	protected void updateMotionY (float deltaTime) 
+	//	{
+	//		switch (jumpState) 
+	//		{
+	//		case GROUNDED://the player is standing on a platform.
+	//			jumpState = JUMP_STATE.FALLING;
+	//
+	//			//if moving, dust appear
+	//			if (velocity.x != 0) 
+	//			{
+	//				dustParticles.setPosition(position.x + dimension.x / 2,position.y-.25f);
+	//				dustParticles.start();
+	//			}
+	//			break;
+	//
+	//		case JUMP_RISING://the player has initiated a jump and is still rising. The maximum jump height has not been reached.
+	//			// Keep track of jump time
+	//			timeJumping += deltaTime;
+	//
+	//			// Jump time left?
+	//			if (timeJumping <= JUMP_TIME_MAX) 
+	//			{
+	//				// Still jumping
+	//				velocity.y = terminalVelocity.y;
+	//			}
+	//			break;
+	//
+	//		case FALLING://the player is falling down.
+	//			break;
+	//
+	//		case JUMP_FALLING://the player is falling down after a previously
+	//			//initiated jump. This state is reached either by jumping as long as possible or
+	//			//by releasing the jump key earlier than that.
+	//
+	//			// Add delta times to track jump time
+	//			timeJumping += deltaTime;
+	//
+	//			// Jump to minimal height if jump key was pressed too short
+	//			if (timeJumping > 0 && timeJumping <= JUMP_TIME_MIN) 
+	//			{
+	//				// Still jumping
+	//				velocity.y = terminalVelocity.y;
+	//			}
+	//		}
+	//
+	//		if (jumpState != JUMP_STATE.GROUNDED)
+	//			dustParticles.allowCompletion();
+	//		super.updateMotionY(deltaTime);
+	//	}
 
 
 	/**
@@ -287,8 +341,15 @@ public class Monkey extends AbstractGameObject
 		dustParticles.draw(batch);
 
 		// Apply Skin Color
-		batch.setColor(
-				CharacterSkin.values()[GamePreferences.instance.charSkin].getColor());
+		batch.setColor(CharacterSkin.values()[GamePreferences.instance.charSkin].getColor());
+
+		float dimCorrectionX = 0;
+		float dimCorrectionY = 0;
+		if (animation != animNormal) 
+		{
+			dimCorrectionX = 0.05f;
+			dimCorrectionY = 0.2f;
+		}
 
 		// Set special color when game object has a feather power-up
 		if (hasPineApplePowerup) 
@@ -297,15 +358,21 @@ public class Monkey extends AbstractGameObject
 		}
 
 		// Draw image
-		reg = regMonkey;
+		reg = animation.getKeyFrame(stateTime, true);
 
 		//the player's character will always
 		//look in the direction it is moving.
-		batch.draw(reg.getTexture(), position.x, position.y-0.5f, origin.x,
-				origin.y, dimension.x, dimension.y, scale.x, scale.y, rotation,
-				reg.getRegionX(), reg.getRegionY(), reg.getRegionWidth(),
-				reg.getRegionHeight(), viewDirection == VIEW_DIRECTION.LEFT,
-				false);// I did position.y-0.5f because the monkey was drawn floating in the air
+		batch.draw(reg.getTexture(),
+				position.x, position.y-0.5f,
+				origin.x, origin.y,
+				dimension.x + dimCorrectionX,
+				dimension.y + dimCorrectionY,
+				scale.x, scale.y,
+				rotation,
+				reg.getRegionX(), reg.getRegionY(),
+				reg.getRegionWidth(), reg.getRegionHeight(),
+				viewDirection == VIEW_DIRECTION.LEFT, false);
+
 
 		// Reset color to white
 		batch.setColor(1, 1, 1, 1);

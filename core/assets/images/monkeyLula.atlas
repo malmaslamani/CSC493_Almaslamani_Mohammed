@@ -11,46 +11,74 @@ MediumRock
   orig: 512, 297
   offset: 0, 0
   index: -1
-SmallRock
+anim_bunny_copter
   rotate: false
-  xy: 516, 419
-  size: 250, 138
-  orig: 250, 138
+  xy: 2, 2
+  size: 256, 256
+  orig: 256, 256
   offset: 0, 0
-  index: -1
+  index: 1
+anim_bunny_copter
+  rotate: false
+  xy: 2, 2
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+anim_bunny_copter
+  rotate: false
+  xy: 516, 301
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+anim_bunny_copter
+  rotate: false
+  xy: 516, 301
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+anim_bunny_copter
+  rotate: false
+  xy: 260, 2
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+anim_bunny_normal
+  rotate: false
+  xy: 518, 43
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
 banana
   rotate: false
-  xy: 768, 429
+  xy: 776, 172
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 cloud01
   rotate: false
-  xy: 260, 90
+  xy: 774, 302
   size: 178, 78
   orig: 178, 78
   offset: 0, 0
   index: -1
 cloud02
   rotate: false
-  xy: 260, 170
+  xy: 774, 469
   size: 198, 88
   orig: 198, 88
   offset: 0, 0
   index: -1
 cloud03
   rotate: false
-  xy: 516, 332
+  xy: 774, 382
   size: 182, 85
   orig: 182, 85
-  offset: 0, 0
-  index: -1
-monkey
-  rotate: false
-  xy: 2, 2
-  size: 256, 256
-  orig: 256, 256
   offset: 0, 0
   index: -1
 mountain_left
@@ -69,15 +97,49 @@ mountain_right
   index: -1
 pineApple
   rotate: false
-  xy: 516, 202
+  xy: 776, 42
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 water_overlay
   rotate: false
-  xy: 898, 397
+  xy: 906, 140
   size: 32, 160
   orig: 32, 160
+  offset: 0, 0
+  index: -1
+
+monkeyLula2.png
+size: 1024,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+SmallRock
+  rotate: false
+  xy: 2, 2
+  size: 250, 138
+  orig: 250, 138
+  offset: 0, 0
+  index: -1
+anim_bunny_normal
+  rotate: false
+  xy: 2, 142
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+anim_bunny_normal
+  rotate: false
+  xy: 260, 142
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+monkey
+  rotate: false
+  xy: 518, 142
+  size: 256, 256
+  orig: 256, 256
   offset: 0, 0
   index: -1

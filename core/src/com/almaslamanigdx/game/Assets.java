@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.utils.Array;
 
 import util.Constants;
 
@@ -122,9 +124,38 @@ public class Assets implements Disposable, AssetErrorListener
 	public class AssetMonkey
 	{
 		public final AtlasRegion monkey;
+		
+		public final Animation animNormal;
+		public final Animation animCopterTransform;
+		public final Animation animCopterTransformBack;
+		public final Animation animCopterRotate;
+		
 		public AssetMonkey (TextureAtlas atlas) 
 		{
 			monkey = atlas.findRegion("monkey");
+			
+			Array<AtlasRegion> regions = null;
+			AtlasRegion region = null;
+			
+			// Animation: Bunny Normal
+			regions = atlas.findRegions("anim_bunny_normal");
+			animNormal = new Animation(1.0f / 10.0f, regions,
+			Animation.PlayMode.LOOP_PINGPONG);
+		
+			// Animation: Bunny Copter - knot ears
+			regions = atlas.findRegions("anim_bunny_copter");
+			animCopterTransform = new Animation(1.0f / 10.0f, regions);
+			
+			// Animation: Bunny Copter - unknot ears
+			regions = atlas.findRegions("anim_bunny_copter");
+			animCopterTransformBack = new Animation(1.0f / 10.0f, regions,
+			Animation.PlayMode.REVERSED);
+			
+			// Animation: Bunny Copter - rotate ears
+			regions = new Array<AtlasRegion>();
+			regions.add(atlas.findRegion("anim_bunny_copter", 4));
+			regions.add(atlas.findRegion("anim_bunny_copter", 5));
+			animCopterRotate = new Animation(1.0f / 15.0f, regions);
 		}
 	}
 

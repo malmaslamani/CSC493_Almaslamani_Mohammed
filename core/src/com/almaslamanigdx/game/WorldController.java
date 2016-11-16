@@ -170,12 +170,11 @@ public class WorldController extends InputAdapter implements Disposable
 
 		PolygonShape polygonShape = new PolygonShape();
 		origin.x = (monkey.bounds.width) / 2.0f;
-		origin.y = (monkey.bounds.height) / 2.0f;
+		origin.y = (monkey.bounds.height-0.8f) / 2.0f;
 		polygonShape.setAsBox((monkey.bounds.width-0.7f) / 2.0f, (monkey.bounds.height-0.15f) / 2.0f, origin, 0);
 
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = polygonShape;
-	   // fixtureDef.friction = 0.5f;
 		body.createFixture(fixtureDef);
 		polygonShape.dispose();
 		
@@ -348,22 +347,22 @@ public class WorldController extends InputAdapter implements Disposable
 	{
 		Monkey monkey = level.monkey;
 
-		float heightDifference = Math.abs(monkey.position.y - ( rock.position.y + rock.bounds.height));
-
-		if (heightDifference > 0.25f) 
-		{
-			boolean hitRightEdge = monkey.position.x > (rock.position.x + rock.bounds.width / 2.0f);
-
-			if (hitRightEdge) 
-			{
-				monkey.position.x = rock.position.x + rock.bounds.width;
-			} 
-			else 
-			{
-				monkey.position.x = rock.position.x -monkey.bounds.width;
-			}
-			return;
-		}
+//		float heightDifference = Math.abs(monkey.position.y - ( rock.position.y + rock.bounds.height));
+//
+//		if (heightDifference > 0.25f) 
+//		{
+//			boolean hitRightEdge = monkey.position.x > (rock.position.x + rock.bounds.width / 2.0f);
+//
+//			if (hitRightEdge) 
+//			{
+//				monkey.position.x = rock.position.x + rock.bounds.width;
+//			} 
+//			else 
+//			{
+//				monkey.position.x = rock.position.x -monkey.bounds.width;
+//			}
+//			return;
+//		}
 
 		switch (monkey.jumpState) 
 		{
@@ -373,12 +372,12 @@ public class WorldController extends InputAdapter implements Disposable
 		case FALLING:
 
 		case JUMP_FALLING: 
-			monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
+			//monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
 			monkey.jumpState = JUMP_STATE.GROUNDED;
 			break;
 
 		case JUMP_RISING:
-			monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
+			//monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
 			break;
 		}
 	}
