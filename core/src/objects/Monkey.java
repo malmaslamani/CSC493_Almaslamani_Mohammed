@@ -77,8 +77,7 @@ public class Monkey extends AbstractGameObject
 
 		animNormal = Assets.instance.monkey.animNormal;
 		animCopterTransform = Assets.instance.monkey.animCopterTransform;
-		animCopterTransformBack =
-				Assets.instance.monkey.animCopterTransformBack;
+		animCopterTransformBack = Assets.instance.monkey.animCopterTransformBack;
 		animCopterRotate = Assets.instance.monkey.animCopterRotate;
 		setAnimation(animNormal);
 
@@ -89,7 +88,7 @@ public class Monkey extends AbstractGameObject
 		bounds.set(0, 0, dimension.x, dimension.y);
 
 		// Set physics values
-		terminalVelocity.set(3.0f, 4.0f);
+		terminalVelocity.set(3.0f, 9.81f);
 		friction.set(12.0f, 0.0f);
 		acceleration.set(0.0f, -25.0f);
 
@@ -131,6 +130,13 @@ public class Monkey extends AbstractGameObject
 				// Start counting jump time from the beginning
 				timeJumping = 0;
 				jumpState = JUMP_STATE.JUMP_RISING;
+				if (body != null)
+				{
+					velocity.y = terminalVelocity.y;
+					body.setLinearVelocity(velocity);
+					velocity.y = 0;
+				}
+				
 			}
 			break;
 
@@ -179,6 +185,7 @@ public class Monkey extends AbstractGameObject
 		updateMotionY(deltaTime);
 		if (body != null)
 		{
+			velocity.y = body.getLinearVelocity().y;
 			body.setLinearVelocity(velocity);
 			position.set(body.getPosition());
 		}
@@ -254,7 +261,7 @@ public class Monkey extends AbstractGameObject
 			timeJumping += deltaTime;
 			if (timeJumping <= JUMP_TIME_MAX)
 			{
-				velocity.y = terminalVelocity.y;
+				//velocity.y = terminalVelocity.y;
 			}
 			else
 				jumpState = JUMP_STATE.JUMP_FALLING;
@@ -263,14 +270,15 @@ public class Monkey extends AbstractGameObject
 			jumpState = JUMP_STATE.GROUNDED;
 			break;
 		case JUMP_FALLING:
-			velocity.y = -terminalVelocity.y;
+			//velocity.y = 0f;
+			//velocity.y = -terminalVelocity.y;
 			break;
 		}
 		if (jumpState != JUMP_STATE.GROUNDED)
 		{
 			//Gdx.app.log(TAG, "stopping particles");
 			dustParticles.allowCompletion();
-			super.updateMotionY(deltaTime);
+			//super.updateMotionY(deltaTime);
 		}
 	}
 

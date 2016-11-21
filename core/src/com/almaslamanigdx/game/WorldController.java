@@ -92,7 +92,7 @@ public class WorldController extends InputAdapter implements Disposable
 	{
 		if (myWorld != null)
 			myWorld.dispose();
-		myWorld = new World(new Vector2(0, -9.81f), true);
+		myWorld = new World(new Vector2(0, -5.81f), true);
 		myWorld.setContactListener(new CollisionHandler(this));  // Not in the book
 		Vector2 origin = new Vector2();
 		
@@ -164,7 +164,7 @@ public class WorldController extends InputAdapter implements Disposable
 
 		Body body = myWorld.createBody(bodyDef);
 		body.setType(BodyType.DynamicBody);
-		body.setGravityScale(9.8f);
+		body.setGravityScale(5.81f);
 		body.setUserData(monkey);
 		monkey.body = body;
 
