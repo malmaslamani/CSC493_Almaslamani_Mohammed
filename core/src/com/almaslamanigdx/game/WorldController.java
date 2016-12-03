@@ -278,7 +278,7 @@ public class WorldController extends InputAdapter implements Disposable
 		// Because the Box2D step function is not running I know
 		// that nothing new is being added to objectsToRemove.
 		handleDebugInput(deltaTime);
-		if (objectsToRemove.size > 0)
+		if (objectsToRemove.size > 0 )
 		{
 			for (AbstractGameObject obj : objectsToRemove)
 			{
@@ -295,6 +295,7 @@ public class WorldController extends InputAdapter implements Disposable
 			objectsToRemove.removeRange(0, objectsToRemove.size - 1);
 		}
 
+		
 		handleInputGame(deltaTime);
 
 		if (MathUtils.random(0.0f, 2.0f) < deltaTime)
