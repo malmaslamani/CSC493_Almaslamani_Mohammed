@@ -3,6 +3,9 @@ package objects;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.almaslamanigdx.game.Assets;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
 
 /**
  * uses the collected variable to store its current state of visibility.
@@ -25,6 +28,8 @@ public class Banana extends AbstractGameObject
 		// Set bounding box for collision detection
 		bounds.set(0, 0, dimension.x, dimension.y);
 		collected = false;
+		
+		
 	}
 	
 	/**

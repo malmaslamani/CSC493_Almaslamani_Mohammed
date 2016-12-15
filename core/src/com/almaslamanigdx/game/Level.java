@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-
 import objects.AbstractGameObject;
 import objects.Banana;
 import objects.Clouds;
@@ -13,22 +12,28 @@ import objects.Mountains;
 import objects.PineApple;
 import objects.Rock;
 import objects.WaterOverlay;
+import objects.BananaGoal;
+import objects.Goal;
 
 public class Level  
 {
 	public Monkey monkey;
 	public Array<Banana> banana;
 	public Array<PineApple> pineApple;
-	
+	public Array<BananaGoal> bananaGoal;
+	public Goal goal;
+
 	public static final String TAG = Level.class.getName();
-	
+
 	public enum BLOCK_TYPE 
 	{
+		GOAL(255, 0, 0), // red - goal
 		EMPTY(0, 0, 0), // black
 		ROCK(0, 255, 0), // green
 		PLAYER_SPAWNPOINT(255, 255, 255), // white
 		ITEM_PINEAPPLE(255, 0, 255), // purple
 		ITEM_BANANA(255, 255, 0); // yellow
+
 
 		private int color;
 
@@ -54,7 +59,7 @@ public class Level
 	public Clouds clouds;
 	public Mountains mountains;
 	public WaterOverlay waterOverlay;
-	
+
 	public Level (String filename) 
 	{
 		init(filename);
@@ -64,11 +69,12 @@ public class Level
 	{
 		// player character
 		monkey = null;
-		
+
 		// objects
 		rocks = new Array<Rock>();
 		banana = new Array<Banana>();
 		pineApple = new Array<PineApple>();
+		bananaGoal = new Array<BananaGoal>();
 
 		// load image file that represents the level data
 		Pixmap pixmap = new Pixmap(Gdx.files.internal(filename));
@@ -141,6 +147,14 @@ public class Level
 					banana.add((Banana)obj);
 				}
 
+				// goal
+				else if (BLOCK_TYPE.GOAL.sameColor(currentPixel)) 
+				{
+					obj = new Goal();
+					offsetHeight = -7.0f;
+					obj.position.set(pixelX, baseHeight + offsetHeight);
+					goal = (Goal)obj;
+				}
 				// unknown object/pixel color
 				else 
 				{
@@ -174,42 +188,52 @@ public class Level
 	{
 		// Draw Mountains
 		mountains.render(batch);
+		
+		// Draw Goal
+		goal.render(batch);
 
 		// Draw Rocks
 		for (Rock rock : rocks)
 			rock.render(batch);
-		
+
 		// Draw Bananas
 		for (Banana banana : banana)
-		banana.render(batch);
-		
+			banana.render(batch);
+
 		// Draw pineApple
 		for (PineApple pineApple : pineApple)
-		pineApple.render(batch);
+			pineApple.render(batch);
 		
+		// Draw Carrots
+		for (BananaGoal bananaGoal : bananaGoal)
+		bananaGoal.render(batch);
+
 		// Draw Player Character
 		monkey.render(batch);
 
 		// Draw Water Overlay
 		waterOverlay.render(batch);
-		
+
 		// Draw Clouds
 		clouds.render(batch);
 	}
-	
+
 	public void update (float deltaTime) 
 	{
 		monkey.update(deltaTime);
-		
+
 		for(Rock rock : rocks)
 			rock.update(deltaTime);
-		
+
 		for(Banana banana : banana)
 			banana.update(deltaTime);
-		
+
 		for(PineApple pineApple : pineApple)
 			pineApple.update(deltaTime);
 		
+		for (BananaGoal bananaGoal : bananaGoal)
+			bananaGoal.update(deltaTime);
+
 		clouds.update(deltaTime);
 	}
 }

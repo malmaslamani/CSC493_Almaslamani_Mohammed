@@ -5,20 +5,10 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.almaslamanigdx.game.Level;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
-import objects.AbstractGameObject;
+
 import objects.Banana;
-import objects.CollisionHandler;
 import objects.Monkey;
 import objects.PineApple;
 import objects.Rock;
@@ -27,48 +17,79 @@ import screens.MenuScreen;
 import util.AudioManager;
 import util.CameraHelper;
 import util.Constants;
+import util.GamePreferences;
 
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.Game;
 
-public class WorldController extends InputAdapter implements Disposable
+/**
+ * the brain of the game ,contains all the game logic to initialize and modify the
+ * game world. It also needs access to CameraHelpe.
+ * @author Mohammed Almaslamani
+ *
+ */
+public class WorldController extends InputAdapter
 {
+	/**
+	 * camera helper reference
+	 */
 	public CameraHelper cameraHelper;
+
+	/**
+	 * level reference
+	 */
 	public Level level;
+
+	/**
+	 * counter of the levels
+	 */
+	public int counter = 0;
+
+
 	public int lives;
 	public int score;
 	private float timeLeftGameOverDelay;
 	private static final String TAG = WorldController.class.getName();
 	private Game game;
-	
-	
-	
+
 	// Rectangles for collision detection
 	private Rectangle r1 = new Rectangle();
 	private Rectangle r2 = new Rectangle();
-	
-	// Box2D Collisions
-	public World myWorld;
-	public Array<AbstractGameObject> objectsToRemove;
-
 
 	//vars to help the lives,bananas animation
 	public float livesVisual;
 	public float scoreVisual;
-	
-	//reference when we need to switch the screen
+
+	private boolean goalReached;
+	public World b2world;
+	private int highScore;
+	private boolean isHighScore;
+	public String ch;
+	public String [] str = new String[10];
+
+	/**
+	 * a constructor that initialize the game 
+	 * reference when we need to switch the screen
+	 * @param game
+	 */
 	public WorldController (Game game) 
 	{
 		this.game = game;
 		init();
+		isHighScore = false;
 	}
-	
+
+
 	/**
 	 * to rebuild whenever we want
 	 */
 	private void init() 
 	{
-		objectsToRemove = new Array<AbstractGameObject>();
-
 		Gdx.input.setInputProcessor(this);
 		cameraHelper = new CameraHelper();
 		lives = Constants.LIVES_START;
@@ -76,111 +97,145 @@ public class WorldController extends InputAdapter implements Disposable
 		timeLeftGameOverDelay = 0;
 		initLevel();
 	}
-	
 
+	/**
+	 * a method to initiate the level
+	 */
 	private void initLevel () 
 	{
-		score = 0;
-		scoreVisual = score;
-		level = new Level(Constants.LEVEL_01);
+		//scoreVisual = score;
+		GamePreferences.instance.load();
+		setGoalReached(false);
+
+		//if level is one, when you start the game 
+		//score will be 0
+		if(counter == 0)
+		{
+			score = 0;
+			scoreVisual = score;
+			level = new Level(Constants.LEVEL_01);
+		}
+
+		//if level is 2, keep the score 
+		if(counter == 1)
+		{
+			//score = score;
+			scoreVisual = score;
+			level = new Level(Constants.LEVEL_02);
+		}
 		cameraHelper.setTarget(level.monkey);
 		initPhysics();
 
 	}
-	
-	private void initPhysics()
+
+	/**
+	 * makes the game return to menu if it is over,
+	 * updates the lives we see , and update our level
+	 * @param deltaTime
+	 */
+	public void update(float deltaTime)
 	{
-		if (myWorld != null)
-			myWorld.dispose();
-		myWorld = new World(new Vector2(0, -5.81f), true);
-		myWorld.setContactListener(new CollisionHandler(this));  // Not in the book
-		Vector2 origin = new Vector2();
-		
-		//for rocks 
-		for (Rock rock : level.rocks)
+		handleDebugInput(deltaTime);
+
+		//when game is over, back to menu
+		if (isGameOver())
 		{
-			BodyDef bodyDef = new BodyDef();
-			bodyDef.position.set(rock.position);
-			bodyDef.type = BodyType.KinematicBody;
-			Body body = myWorld.createBody(bodyDef);
-			//body.setType(BodyType.DynamicBody);
-			body.setUserData(rock);
-			rock.body = body;
-			PolygonShape polygonShape = new PolygonShape();
-			origin.x = rock.bounds.width / 2.0f;
-			origin.y = rock.bounds.height / 2.0f;
-			polygonShape.setAsBox(rock.bounds.width / 2.0f, (rock.bounds.height-0.04f) / 4.0f, origin, 0);
-			FixtureDef fixtureDef = new FixtureDef();
-			fixtureDef.shape = polygonShape;
-			body.createFixture(fixtureDef);
-			polygonShape.dispose();
-		}
-		
-		//for banana 
-		for (Banana banana : level.banana)
+			GamePreferences.instance.save();
+			score = 0;
+			timeLeftGameOverDelay -= deltaTime;
+
+			if (timeLeftGameOverDelay < 0) 
+				backToMenu();
+		} 
+		//when goal is reached and the counter is 0, go 
+		//to first level
+		if(isGoalReached() && counter == 0)
 		{
-			BodyDef bodyDef = new BodyDef();
-			bodyDef.position.set(banana.position);
-			bodyDef.type = BodyType.KinematicBody;
-			Body body = myWorld.createBody(bodyDef);
-			//body.setType(BodyType.DynamicBody);
-			body.setUserData(banana);
-			banana.body = body;
-			PolygonShape polygonShape = new PolygonShape();
-			origin.x = banana.bounds.width / 2.0f;
-			origin.y = banana.bounds.height / 2.0f;
-			polygonShape.setAsBox(banana.bounds.width / 2.0f, (banana.bounds.height-0.04f) / 4.0f, origin, 0);
-			FixtureDef fixtureDef = new FixtureDef();
-			fixtureDef.shape = polygonShape;
-			body.createFixture(fixtureDef);
-			polygonShape.dispose();
-		}
-		
-		//for pineapple powerUp
-		for (PineApple pineapple : level.pineApple)
-		{
-			BodyDef bodyDef = new BodyDef();
-			bodyDef.position.set(pineapple.position);
-			bodyDef.type = BodyType.KinematicBody;
-			Body body = myWorld.createBody(bodyDef);
-			//body.setType(BodyType.DynamicBody);
-			body.setUserData(pineapple);
-			pineapple.body = body;
-			PolygonShape polygonShape = new PolygonShape();
-			origin.x = pineapple.bounds.width / 2.0f;
-			origin.y = pineapple.bounds.height / 2.0f;
-			polygonShape.setAsBox(pineapple.bounds.width / 2.0f, (pineapple.bounds.height-0.04f) / 4.0f, origin, 0);
-			FixtureDef fixtureDef = new FixtureDef();
-			fixtureDef.shape = polygonShape;
-			body.createFixture(fixtureDef);
-			polygonShape.dispose();
+			counter = 1;
+			initLevel();
 		}
 
-		// For PLayer
-		Monkey monkey = level.monkey;
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.position.set(monkey.position);
-		bodyDef.fixedRotation = true;
+		//when goal is reached and level is 2,
+		//go to menu
+		if(isGoalReached() && counter == 1)
+		{
+			GamePreferences.instance.save();
 
-		Body body = myWorld.createBody(bodyDef);
-		body.setType(BodyType.DynamicBody);
-		body.setGravityScale(5.81f);
-		body.setUserData(monkey);
-		monkey.body = body;
+			score = 0;
+			//game.setScreen(new HighScoreScreen(game, score));
+			backToMenu();
+		}
 
-		PolygonShape polygonShape = new PolygonShape();
-		origin.x = (monkey.bounds.width) / 2.0f;
-		origin.y = (monkey.bounds.height-0.8f) / 2.0f;
-		polygonShape.setAsBox((monkey.bounds.width-0.7f) / 2.0f, (monkey.bounds.height-0.15f) / 2.0f, origin, 0);
+		else 
+		{
+			handleInputGame(deltaTime);
+		}
 
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = polygonShape;
-		body.createFixture(fixtureDef);
-		polygonShape.dispose();
-		
-	
+		level.update(deltaTime);
+		testCollisions();
+//		b2world.step(deltaTime,  8,  3);
+		cameraHelper.update(deltaTime);
+
+		//when the game is not over yet, and the monkey fell in the water
+		//decrease one life
+		if (!isGameOver() && isPlayerInWater()) 
+		{
+			GamePreferences.instance.save();
+			//will play live_lost.wav when player hit the water.
+			AudioManager.instance.play(Assets.instance.sounds.liveLost);
+
+			lives--;
+
+			//if game is over, (no lives)
+			//handle the message of GAME OVER and set a time delay for it.
+			if (isGameOver())
+			{
+				timeLeftGameOverDelay = Constants.TIME_DELAY_GAME_OVER;
+			}
+			else
+			{
+				initLevel();
+			}
+		}
+
+		//All three mountain layers will now scroll at different speeds: 30 percent, 50 percent,
+		//and 80 percent.
+		level.mountains.updateScrollPosition
+		(cameraHelper.getPosition());
+
+		//This enables us to play an animation as long
+		//as livesVisual has not yet reached the current value of lives
+		if (livesVisual> lives)
+			livesVisual = Math.max(lives, livesVisual - 1 * deltaTime);
+
+		if (scoreVisual< score)
+			scoreVisual = Math.min(score, scoreVisual + 250 * deltaTime);
+
+		//computations to compare different scores.
+		if(score > GamePreferences.instance.highscore4 && score < GamePreferences.instance.highscore3)
+		{
+			GamePreferences.instance.highscore4 = score;
+		}
+
+		if(score > GamePreferences.instance.highscore3 && score < GamePreferences.instance.highscore2)
+		{
+			GamePreferences.instance.highscore3 = score;
+		}
+
+		if(score > GamePreferences.instance.highscore2 && score < GamePreferences.instance.highscore1)
+		{
+			GamePreferences.instance.highscore2 = score;
+		}
+
+		if(score > GamePreferences.instance.highscore1)
+		{
+			GamePreferences.instance.highscore1 = score;
+		}
+		isHighScore = true;
+
+
+
 	}
-
 
 	/**
 	 * save a reference to the game instance, which will enable us to switch to another screen.
@@ -189,154 +244,6 @@ public class WorldController extends InputAdapter implements Disposable
 	{
 		// switch to menu screen
 		game.setScreen(new MenuScreen(game));
-	}
-	
-	
-
-	/**
-	 * control the monkey with right, left keys...
-	 * @param deltaTime
-	 */
-	private void handleInputGame (float deltaTime) 
-	{
-		if (cameraHelper.hasTarget(level.monkey)) 
-		{
-			// Player Movement
-			if (Gdx.input.isKeyPressed(Keys.LEFT)) 
-			{
-				level.monkey.velocity.x = -level.monkey.terminalVelocity.x;
-			} 
-			else if (Gdx.input.isKeyPressed(Keys.RIGHT))
-			{
-				level.monkey.velocity.x =level.monkey.terminalVelocity.x;
-			} 
-			else 
-			{
-				// Execute auto-forward movement on non-desktop platform
-				if (Gdx.app.getType() != ApplicationType.Desktop)
-				{
-					level.monkey.velocity.x = level.monkey.terminalVelocity.x;
-				}
-			}
-			// monkey Jump
-			if (Gdx.input.isTouched() ||Gdx.input.isKeyPressed(Keys.SPACE)) 
-			{
-				level.monkey.setJumping(true);
-			} 
-			else 
-			{
-				level.monkey.setJumping(false);
-			}
-		}
-	}
-	
-//	private void spawnBlocks(Vector2 pos, int numBlocks, float radius)
-//	{
-//		float blockShapeScale = 0.5f;
-//		for (int i = 0; i<numBlocks; i++)
-//		{
-//			Banana banana = new Banana();
-//			float x = MathUtils.random(-radius,radius);
-//			float y = MathUtils.random(5.0f, 15.0f);
-//			//float rotation = MathUtils.random(0.0f, 360.0f) * MathUtils.degreesToRadians;
-//			float blockScale = MathUtils.random(0.5f, 1.5f);
-//			banana.scale.set(blockScale, blockScale);
-//
-//			BodyDef bodyDef = new BodyDef();
-//			bodyDef.position.set(pos);
-//			bodyDef.position.add(x, y);
-//			bodyDef.angle = 0; // rotation;
-//			Body body = myWorld.createBody(bodyDef);
-//			body.setType(BodyType.DynamicBody);
-//			body.setUserData(banana);
-//			banana.body = body;
-//
-//			PolygonShape polygonShape = new PolygonShape();
-//			float halfWidth = banana.bounds.width / 2.0f * blockScale;
-//			float halfHeight = banana.bounds.height / 2.0f * blockScale;
-//			polygonShape.setAsBox(halfWidth * blockShapeScale, halfHeight * blockShapeScale);
-//
-//			FixtureDef fixtureDef = new FixtureDef();
-//			fixtureDef.shape = polygonShape;
-//			fixtureDef.density = 50;
-//			fixtureDef.restitution = 0.5f;
-//			fixtureDef.friction = 0.5f;
-//			body.createFixture(fixtureDef);
-//			polygonShape.dispose();
-//			level.banana.add(banana);
-//		}
-//	}
-	
-	public void flagForRemoval(AbstractGameObject obj)
-	{
-		objectsToRemove.add(obj);
-	}
-	
-	
-	public void update(float deltaTime)
-	{
-		// Because the Box2D step function is not running I know
-		// that nothing new is being added to objectsToRemove.
-		handleDebugInput(deltaTime);
-		if (objectsToRemove.size > 0 )
-		{
-			for (AbstractGameObject obj : objectsToRemove)
-			{
-				if (obj instanceof Banana)
-				{
-					int index = level.banana.indexOf((Banana) obj, true);
-					if (index != -1)
-					{
-					    level.banana.removeIndex(index);
-					    myWorld.destroyBody(obj.body);
-					}
-				}
-			}
-			objectsToRemove.removeRange(0, objectsToRemove.size - 1);
-		}
-
-		
-		handleInputGame(deltaTime);
-
-		if (MathUtils.random(0.0f, 2.0f) < deltaTime)
-		{
-		    // Temp Location to Trigger Blocks
-		    Vector2 centerPos = new Vector2(level.monkey.position);
-		    centerPos.x += level.monkey.bounds.width;
-		  //  spawnBlocks(centerPos, Constants.BLOCKS_SPAWN_MAX, Constants.BLOCKS_SPAWN_RADIUS);
-		}
-
-		myWorld.step(deltaTime, 8, 3);  // Tell the Box2D world to update.
-		level.update(deltaTime);
-		testCollisions();
-
-		cameraHelper.update(deltaTime);
-		
-		if (!isGameOver() && isPlayerInWater()) 
-			{
-				//will play live_lost.wav when player hit the water.
-				AudioManager.instance.play(Assets.instance.sounds.liveLost);
-			
-				lives--;
-				
-				if (isGameOver())
-					timeLeftGameOverDelay = Constants.TIME_DELAY_GAME_OVER;
-				else
-					initLevel();
-			}
-		
-		//All three mountain layers will now scroll at different speeds: 30 percent, 50 percent,
-		//and 80 percent.
-		level.mountains.updateScrollPosition
-		(cameraHelper.getPosition());
-		
-		//This enables us to play an animation as long
-		//as livesVisual has not yet reached the current value of lives
-		if (livesVisual> lives)
-			livesVisual = Math.max(lives, livesVisual - 1 * deltaTime);
-		
-		if (scoreVisual< score)
-			scoreVisual = Math.min(score, scoreVisual + 250 * deltaTime);
 	}
 
 	/**
@@ -348,22 +255,22 @@ public class WorldController extends InputAdapter implements Disposable
 	{
 		Monkey monkey = level.monkey;
 
-//		float heightDifference = Math.abs(monkey.position.y - ( rock.position.y + rock.bounds.height));
-//
-//		if (heightDifference > 0.25f) 
-//		{
-//			boolean hitRightEdge = monkey.position.x > (rock.position.x + rock.bounds.width / 2.0f);
-//
-//			if (hitRightEdge) 
-//			{
-//				monkey.position.x = rock.position.x + rock.bounds.width;
-//			} 
-//			else 
-//			{
-//				monkey.position.x = rock.position.x -monkey.bounds.width;
-//			}
-//			return;
-//		}
+		float heightDifference = Math.abs(monkey.position.y - ( rock.position.y + rock.bounds.height));
+
+		if (heightDifference > 0.25f) 
+		{
+			boolean hitRightEdge = monkey.position.x > (rock.position.x + rock.bounds.width / 2.0f);
+
+			if (hitRightEdge) 
+			{
+				monkey.position.x = rock.position.x + rock.bounds.width;
+			} 
+			else 
+			{
+				monkey.position.x = rock.position.x -monkey.bounds.width;
+			}
+			return;
+		}
 
 		switch (monkey.jumpState) 
 		{
@@ -373,12 +280,12 @@ public class WorldController extends InputAdapter implements Disposable
 		case FALLING:
 
 		case JUMP_FALLING: 
-			//monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
+			monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
 			monkey.jumpState = JUMP_STATE.GROUNDED;
 			break;
 
 		case JUMP_RISING:
-			//monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
+			monkey.position.y = rock.position.y + monkey.bounds.height + monkey.origin.y;
 			break;
 		}
 	}
@@ -404,7 +311,7 @@ public class WorldController extends InputAdapter implements Disposable
 	private void onCollisionMonkeyWithPineApple(PineApple pineApple) 
 	{
 		pineApple.collected = true;
-		
+
 		score += pineApple.getScore();
 		AudioManager.instance.play(Assets.instance.sounds.eatBanana);
 		level.monkey.setPineApplePowerup(true);
@@ -433,7 +340,7 @@ public class WorldController extends InputAdapter implements Disposable
 			// edge testing on rocks.
 		}
 
-		// Test collision: monkey <-> bananas
+		// Test collision: Bunny Head <-> bananas
 		for (Banana banana : level.banana)
 		{
 			if (banana.collected) 
@@ -464,59 +371,18 @@ public class WorldController extends InputAdapter implements Disposable
 			onCollisionMonkeyWithPineApple(pineApple);
 			break;
 		}
+
+		// Test collision: Monkey <-> Goal
+		if (!isGoalReached()) 
+		{
+			r2.set(level.goal.bounds);
+			r2.x += level.goal.position.x;
+			r2.y += level.goal.position.y;
+			if (r1.overlaps(r2)) 
+				onCollisionBunnyWithGoal();
+		}
 	}
 
-	/**
-	 * makes the game return to menu if it is over,
-	 * updates the lives we see , and update our level
-	 * @param deltaTime
-	 */
-//	public void update(float deltaTime)
-//	{
-//		handleDebugInput(deltaTime);
-//		if (isGameOver()) 
-//		{
-//			timeLeftGameOverDelay -= deltaTime;
-//
-//			if (timeLeftGameOverDelay < 0) 
-//				backToMenu();
-//
-//		} 
-//		else 
-//		{
-//			handleInputGame(deltaTime);
-//		}
-//
-//		level.update(deltaTime);
-//		testCollisions();
-//		cameraHelper.update(deltaTime);
-//
-//		if (!isGameOver() && isPlayerInWater()) 
-//		{
-//			//will play live_lost.wav when player hit the water.
-//			AudioManager.instance.play(Assets.instance.sounds.liveLost);
-//		
-//			lives--;
-//			
-//			if (isGameOver())
-//				timeLeftGameOverDelay = Constants.TIME_DELAY_GAME_OVER;
-//			else
-//				initLevel();
-//		}
-//		
-//		//All three mountain layers will now scroll at different speeds: 30 percent, 50 percent,
-//		//and 80 percent.
-//		level.mountains.updateScrollPosition
-//		(cameraHelper.getPosition());
-//		
-//		//This enables us to play an animation as long
-//		//as livesVisual has not yet reached the current value of lives
-//		if (livesVisual> lives)
-//			livesVisual = Math.max(lives, livesVisual - 1 * deltaTime);
-//		
-//		if (scoreVisual< score)
-//			scoreVisual = Math.min(score, scoreVisual + 250 * deltaTime);
-//	}
 
 	/**
 	 * handles the camera movement
@@ -581,7 +447,20 @@ public class WorldController extends InputAdapter implements Disposable
 			cameraHelper.setZoom(1);
 		}
 	}
-	
+
+	/**
+	 * Moving the camera around
+	 * @param x
+	 * @param y
+	 */
+	private void moveCamera(float x,float y)
+	{
+		x += cameraHelper.getPosition().x;
+		y += cameraHelper.getPosition().y;
+		cameraHelper.setPosition(x, y);
+	}
+
+
 	/**
 	 * handles resetting the game or following the character by camera.
 	 */
@@ -612,17 +491,74 @@ public class WorldController extends InputAdapter implements Disposable
 	}
 
 	/**
-	 * Moving the camera around
-	 * @param x
-	 * @param y
+	 * control the monkey with right, left keys...
+	 * @param deltaTime
 	 */
-	private void moveCamera(float x,float y)
+	private void handleInputGame(float deltaTime) 
 	{
-		x += cameraHelper.getPosition().x;
-		y += cameraHelper.getPosition().y;
-		cameraHelper.setPosition(x, y);
-	}
+		if (cameraHelper.hasTarget(level.monkey)) 
+		{
+			// monkey Movement
+			if (Gdx.input.isKeyPressed(Keys.LEFT)) 
+			{
+				level.monkey.velocity.x = -level.monkey.terminalVelocity.x;
+			} 
+			else if (Gdx.input.isKeyPressed(Keys.RIGHT)) 
+			{
+				level.monkey.velocity.x = level.monkey.terminalVelocity.x;
+			}
+		} 
+		else 
+		{
+			// Execute auto-forward movement on non-desktop platform
+			if (Gdx.app.getType() != ApplicationType.Desktop) 
+			{
+				level.monkey.velocity.x = level.monkey.terminalVelocity.x;
+			}
+		}
 
+		// monkey is jumping
+		if (Gdx.input.isTouched() || Gdx.input.isKeyPressed(Keys.SPACE)) 
+		{
+			level.monkey.setJumping(true);
+		} 
+		else 
+		{
+			level.monkey.setJumping(false);
+		}
+	}
+//	private void handleInputGame (float deltaTime) 
+//	{
+//		if (cameraHelper.hasTarget(level.monkey)) 
+//		{
+//			// Player Movement
+//			if (Gdx.input.isKeyPressed(Keys.LEFT)) 
+//			{
+//				level.monkey.velocity.x = -level.monkey.terminalVelocity.x;
+//			} 
+//			else if (Gdx.input.isKeyPressed(Keys.RIGHT))
+//			{
+//				level.monkey.velocity.x =level.monkey.terminalVelocity.x;
+//			} 
+//			else 
+//			{
+//				// Execute auto-forward movement on non-desktop platform
+//				if (Gdx.app.getType() != ApplicationType.Desktop)
+//				{
+//					level.monkey.velocity.x = level.monkey.terminalVelocity.x;
+//				}
+//			}
+//			// monkey Jump
+//			if (Gdx.input.isTouched() ||Gdx.input.isKeyPressed(Keys.SPACE)) 
+//			{
+//				level.monkey.setJumping(true);
+//			} 
+//			else 
+//			{
+//				level.monkey.setJumping(false);
+//			}
+//		}
+//	}
 
 	/**
 	 * checks if game is over
@@ -640,11 +576,78 @@ public class WorldController extends InputAdapter implements Disposable
 	{
 		return level.monkey.position.y < -5;
 	}
-	
-	@Override
-	public void dispose()
+
+	/**
+	 * when the player reach the goal- banana's rain
+	 */
+	private void onCollisionBunnyWithGoal() 
 	{
-		if (myWorld != null)
-			myWorld.dispose();
+		setGoalReached(true);
+		timeLeftGameOverDelay = Constants.TIME_DELAY_GAME_FINISHED;
 	}
+
+
+	public boolean isGoalReached() 
+	{
+		return goalReached;
+	}
+
+
+	public void setGoalReached(boolean goalReached) 
+	{
+		this.goalReached = goalReached;
+	}
+
+	private void initPhysics()
+	{
+		if(b2world!=null)
+			b2world.dispose();
+		
+		b2world = new World(new Vector2(0, -9.81f), true);
+
+
+		//Rocks
+		Vector2 origin=new Vector2();
+		for(Rock rock : level.rocks){
+			BodyDef bDef=new BodyDef();
+			bDef.type=BodyType.KinematicBody;
+			bDef.position.set(rock.position);
+
+			Body body=b2world.createBody(bDef);
+			body.setUserData(rock); 
+			rock.body=body;
+
+			PolygonShape pShape=new PolygonShape();
+			origin.x=rock.bounds.width/2.0f;
+			origin.y=rock.bounds.height/2.0f;
+			pShape.setAsBox(rock.bounds.width/1.8f, rock.bounds.height/2.0f, origin, 0);	
+			FixtureDef fDef=new FixtureDef();
+			fDef.shape=pShape;
+			body.createFixture(fDef);
+			pShape.dispose();
+		}
+
+		//player
+		Monkey monkey = level.monkey;
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.position.set(monkey.position);
+		bodyDef.fixedRotation = true;
+
+		Body body = b2world.createBody(bodyDef);
+		body.setType(BodyType.DynamicBody);
+		body.setGravityScale(9.8f);
+		body.setUserData(monkey);
+		monkey.body = body;
+
+		PolygonShape polygonShape = new PolygonShape();
+		origin.x = (monkey.bounds.width) / 2.0f;
+		origin.y = (monkey.bounds.height) / 2.0f;
+		polygonShape.setAsBox((monkey.bounds.width-0.7f) / 2.0f, (monkey.bounds.height-0.15f) / 2.0f, origin, 0);
+
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.shape = polygonShape;
+		body.createFixture(fixtureDef);
+		polygonShape.dispose();
+	}
+
 }

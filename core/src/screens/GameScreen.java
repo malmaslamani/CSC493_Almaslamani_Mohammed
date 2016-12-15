@@ -32,9 +32,6 @@ public class GameScreen extends AbstractGameScreen
 			// since last rendered frame.
 			worldController.update(deltaTime);
 		}
-
-		// Sets the clear screen color to: Cornflower Blue
-		//Gdx.gl.glClearColor(0x64 / 255.0f, 0x95 / 255.0f,0xed /255.0f, 0xff / 255.0f);
 		
 		// Sets the clear screen color to: pink
 		Gdx.gl.glClearColor(1.0f, .8f, .667f, 1);
@@ -71,7 +68,7 @@ public class GameScreen extends AbstractGameScreen
 	@Override
 	public void hide () 
 	{
-		worldController.dispose();
+		//worldController.dispose();
 		worldRenderer.dispose();
 		Gdx.input.setCatchBackKey(false);
 	}

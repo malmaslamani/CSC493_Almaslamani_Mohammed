@@ -7,30 +7,28 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.MathUtils;
 
-public abstract class AbstractGameObject 
+
+public abstract class AbstractGameObject
 {
 	public Vector2 position;
 	public Vector2 dimension;
 	public Vector2 origin;
 	public Vector2 scale;
 	public float rotation;
-
-	// Non-Box2D Physics
 	public Vector2 velocity;//the object's current speed in m/s.
 	public Vector2 terminalVelocity;//positive and negative maximum speed in m/s.
 	public Vector2 friction;//opposing force that slows down the object
 	public Vector2 acceleration;//constant acceleration in m/s².
 	public Rectangle bounds;//used for collision detection with other objects.
 
-	// Box2D Physics
-	public Body body;
-
-	// Animation
 	public float stateTime;
 	public Animation animation;
+	
+	public Body body;
 
 
-	public AbstractGameObject () 
+
+	public AbstractGameObject ()
 	{
 		position = new Vector2();
 		dimension = new Vector2(1, 1);
@@ -45,21 +43,50 @@ public abstract class AbstractGameObject
 
 	}
 
+	public void update (float deltaTime)
+	{
+		stateTime += deltaTime;
+		updateMotionX(deltaTime);
+		updateMotionY(deltaTime);
+
+		// Move to new position
+		position.x += velocity.x * deltaTime;
+		position.y += 2*velocity.y * deltaTime; //doubled (Assignment 6 C)
+	}
+	
+//	public void update(float deltaTime) 
+//	{
+//		stateTime+=deltaTime;
+//		if (body == null) {
+//			updateMotionX(deltaTime);
+//			updateMotionY(deltaTime);
+//
+//			// Move to new position
+//			position.x += velocity.x * deltaTime;
+//			position.y += velocity.y * deltaTime;
+//		} else {
+//			position.set(body.getPosition());
+//			rotation = body.getAngle() * MathUtils.radiansToDegrees;
+//		}
+//	}
+
+	public abstract void render (SpriteBatch batch);
+
 	/**
-	 * called on every update cycle to calculate the next x and y 
+	 * called on every update cycle to calculate the next x and y
 	 * components of the object's velocity in terms of the given delta time
 	 * @param deltaTime
 	 */
-	protected void updateMotionX (float deltaTime) 
+	protected void updateMotionX (float deltaTime)
 	{
-		if (velocity.x != 0) 
+		if (velocity.x != 0)
 		{
 			// Apply friction
 			if (velocity.x > 0)
 			{
 				velocity.x = Math.max(velocity.x - friction.x * deltaTime, 0);
-			} 
-			else 
+			}
+			else
 			{
 				velocity.x = Math.min(velocity.x + friction.x * deltaTime, 0);
 			}
@@ -73,41 +100,17 @@ public abstract class AbstractGameObject
 		velocity.x = MathUtils.clamp(velocity.x,-terminalVelocity.x, terminalVelocity.x);
 	}
 
-	public void update (float deltaTime) 
+	protected void updateMotionY (float deltaTime)
 	{
-		stateTime += deltaTime;
-		if(body == null)
-		{
-			updateMotionX(deltaTime);
-			updateMotionY(deltaTime);
-
-			// Move to new position
-			position.x += velocity.x * deltaTime;
-			position.y += 2*velocity.y * deltaTime; //doubled (Assignment 6 C)
-		}
-		else
-		{
-			position.set(body.getPosition());
-			rotation = body.getAngle() * MathUtils.radiansToDegrees;
-		}
-
-	}
-
-	public abstract void render (SpriteBatch batch);
-
-
-
-	protected void updateMotionY (float deltaTime) 
-	{
-		if (velocity.y != 0) 
+		if (velocity.y != 0)
 		{
 
 			// Apply friction
-			if (velocity.y > 0) 
+			if (velocity.y > 0)
 			{
 				velocity.y = Math.max(velocity.y - friction.y *deltaTime, 0);
-			} 
-			else 
+			}
+			else
 			{
 				velocity.y = Math.min(velocity.y + friction.y *deltaTime, 0);
 			}
@@ -121,9 +124,9 @@ public abstract class AbstractGameObject
 		velocity.y = MathUtils.clamp(velocity.y, -terminalVelocity.y, terminalVelocity.y);
 	}
 
-	public void setAnimation (Animation animation) 
+	public void setAnimation (Animation animation)
 	{
-		this.animation = animation;
-		stateTime = 0;
-	}
+		 this.animation = animation;
+		 stateTime = 0;
+		}
 }

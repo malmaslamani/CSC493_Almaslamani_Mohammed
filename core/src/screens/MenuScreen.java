@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -21,13 +22,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
-import com.badlogic.gdx.math.Interpolation;
 import util.AudioManager;
 import util.CharacterSkin;
 import util.Constants;
 import util.GamePreferences;
 import com.almaslamanigdx.game.Assets;
+import com.almaslamanigdx.game.WorldController;
+import com.almaslamanigdx.game.WorldRenderer;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 
@@ -44,6 +47,7 @@ public class MenuScreen extends AbstractGameScreen
 	private Image imgBunny;
 	private Button btnMenuPlay;
 	private Button btnMenuOptions;
+	private TextButton btnHighScore;
 	// options
 	private Window winOptions;
 	private TextButton btnWinOptSave;
@@ -61,26 +65,29 @@ public class MenuScreen extends AbstractGameScreen
 	private float debugRebuildStage;
 
 	private Skin skinLibgdx;
+	public WorldController wc;
+	public WorldRenderer worldRenderer;
+	public int score;
 
-	public MenuScreen (Game game) 
+	public MenuScreen (Game game)
 	{
 		super(game);
 	}
 
 	/**
-	 * clear the screen by filling it solid black 
+	 * clear the screen by filling it solid black
 	 * and checks if the screen has been touched or not.
 	 */
 	@Override
-	public void render (float deltaTime) 
+	public void render (float deltaTime)
 	{
 		Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		if (debugEnabled) 
+		if (debugEnabled)
 		{
 			debugRebuildStage -= deltaTime;
-			if (debugRebuildStage <= 0) 
+			if (debugRebuildStage <= 0)
 			{
 				debugRebuildStage = DEBUG_REBUILD_INTERVAL;
 				rebuildStage();
@@ -89,12 +96,13 @@ public class MenuScreen extends AbstractGameScreen
 		stage.act(deltaTime);
 		stage.draw();
 		stage.setDebugAll(false);//to draw debug lines on the menu screen, have to be true.
+	
 	}
 
 	/**
 	 * sets the viewport size of the stage.
 	 */
-	@Override public void resize (int width, int height) 
+	@Override public void resize (int width, int height)
 	{
 		stage.getViewport().update(width, height, true);
 	}
@@ -102,7 +110,7 @@ public class MenuScreen extends AbstractGameScreen
 	/**
 	 * called when the screen is shown,initializes the stage, and ready to receive inputs
 	 */
-	@Override public void show () 
+	@Override public void show ()
 	{
 		stage = new Stage(new StretchViewport(Constants.VIEWPORT_GUI_WIDTH,Constants.VIEWPORT_GUI_HEIGHT));
 		Gdx.input.setInputProcessor(stage);
@@ -112,7 +120,7 @@ public class MenuScreen extends AbstractGameScreen
 	/**
 	 * free the allocated resources when the screen is hidden
 	 */
-	@Override public void hide () 
+	@Override public void hide ()
 	{
 		stage.dispose();
 		skinCanyonBunny.dispose();
@@ -121,8 +129,8 @@ public class MenuScreen extends AbstractGameScreen
 	@Override public void pause () { }
 
 	/**
-	 * will make up the final scene of our menu screen. 
-	 * This method is implemented in a way so that it can be 
+	 * will make up the final scene of our menu screen.
+	 * This method is implemented in a way so that it can be
 	 * called in a repeated manner
 	 */
 	private void rebuildStage ()
@@ -154,7 +162,7 @@ public class MenuScreen extends AbstractGameScreen
 	 * background image drawn to the scene of the menu screen
 	 * @return tbl
 	 */
-	private Table buildBackgroundLayer () 
+	private Table buildBackgroundLayer ()
 	{
 		Table layer = new Table();
 		// + Background
@@ -167,24 +175,20 @@ public class MenuScreen extends AbstractGameScreen
 	 * an image of some coins and another image of a huge bunny head TO BE CHANGED
 	 * @return tbl
 	 */
-	private Table buildObjectsLayer () 
+	private Table buildObjectsLayer ()
 	{
 		Table layer = new Table();
-		// + Coins
+		// + Banana
 		imgCoins = new Image(skinCanyonBunny, "banana");
 		layer.addActor(imgCoins);
 		imgCoins.setOrigin(imgCoins.getWidth() / 2,
 				imgCoins.getHeight() / 2);
-		imgCoins.addAction(sequence(
-				moveTo(135, -20),
-				scaleTo(0, 0),
-				fadeOut(0),
+		imgCoins.addAction(sequence(moveTo(135, -20),scaleTo(0, 0),fadeOut(0),
 				delay(2.5f),
 				parallel(moveBy(0, 100, 0.5f, Interpolation.swingOut),
 						scaleTo(1.0f, 1.0f, 0.25f, Interpolation.linear),
 						alpha(1.0f, 0.5f))));
-
-		// + Bunny
+		// + Monkey
 		imgBunny = new Image(skinCanyonBunny, "monkey");
 		layer.addActor(imgBunny);
 		imgBunny.addAction(sequence(
@@ -195,12 +199,11 @@ public class MenuScreen extends AbstractGameScreen
 				moveBy(-150, -300, 1.0f, Interpolation.elasticIn)));
 		return layer;
 	}
-
 	/**
 	 * in the top-left corner of the screen
 	 * @return tbl
 	 */
-	private Table buildLogosLayer () 
+	private Table buildLogosLayer ()
 	{
 		Table layer = new Table();
 		layer.left().top();
@@ -215,7 +218,7 @@ public class MenuScreen extends AbstractGameScreen
 		layer.add(imgInfo).bottom();
 
 		//draw debug layers if enabled
-		if (debugEnabled) 
+		if (debugEnabled)
 			layer.debug();
 		return layer;
 	}
@@ -224,7 +227,7 @@ public class MenuScreen extends AbstractGameScreen
 	 * in the bottom-right corner of the screen. A new button widget is added using the Play style
 	 * @return tbl
 	 */
-	private Table buildControlsLayer () 
+	private Table buildControlsLayer ()
 	{
 		Table layer = new Table();
 		layer.right().bottom();
@@ -232,10 +235,10 @@ public class MenuScreen extends AbstractGameScreen
 		// + Play Button
 		btnMenuPlay = new Button(skinCanyonBunny, "play");
 		layer.add(btnMenuPlay);
-		btnMenuPlay.addListener(new ChangeListener() 
+		btnMenuPlay.addListener(new ChangeListener()
 		{
 			@Override
-			public void changed (ChangeEvent event, Actor actor) 
+			public void changed (ChangeEvent event, Actor actor)
 			{
 				onPlayClicked();
 			}
@@ -245,16 +248,18 @@ public class MenuScreen extends AbstractGameScreen
 		// + Options Button
 		btnMenuOptions = new Button(skinCanyonBunny, "options");
 		layer.add(btnMenuOptions);
-		btnMenuOptions.addListener(new ChangeListener() 
+		btnMenuOptions.addListener(new ChangeListener()
 		{
 			@Override
-			public void changed (ChangeEvent event, Actor actor) 
+			public void changed (ChangeEvent event, Actor actor)
 			{
 				onOptionsClicked();
 			}
 		});
+		layer.row();
 
-		if (debugEnabled) 
+
+		if (debugEnabled)
 			layer.debug();
 		return layer;
 	}
@@ -264,7 +269,7 @@ public class MenuScreen extends AbstractGameScreen
 	 *  It builds each part of the menu using the build methods
 	 * @return tbl
 	 */
-	private Table buildOptionsWindowLayer () 
+	private Table buildOptionsWindowLayer ()
 	{
 		winOptions = new Window("Options", skinLibgdx);
 		// + Audio Settings: Sound/Music CheckBox and Volume Slider
@@ -281,12 +286,9 @@ public class MenuScreen extends AbstractGameScreen
 
 		// Make options window slightly transparent
 		winOptions.setColor(1, 1, 1, 0.8f);
-		
+
 		// Hide options window by default
 		showOptionsWindow(false, false);
-
-		if (debugEnabled) 
-			winOptions.debug();
 
 		// Let TableLayout recalculate widget sizes and positions
 		winOptions.pack();
@@ -302,7 +304,7 @@ public class MenuScreen extends AbstractGameScreen
 	 * builds a table containing the audio settings labels and checkbox
 	 * @return tbl
 	 */
-	private Table buildOptWinAudioSettings () 
+	private Table buildOptWinAudioSettings ()
 	{
 		Table tbl = new Table();
 
@@ -350,10 +352,10 @@ public class MenuScreen extends AbstractGameScreen
 		// + Drop down box filled with skin items
 		selCharSkin = new SelectBox<CharacterSkin>(skinLibgdx);
 		selCharSkin.setItems(CharacterSkin.values());
-		selCharSkin.addListener(new ChangeListener() 
+		selCharSkin.addListener(new ChangeListener()
 		{
 			@Override
-			public void changed(ChangeEvent event, Actor actor) 
+			public void changed(ChangeEvent event, Actor actor)
 			{
 				onCharSkinSelected(((SelectBox<CharacterSkin>)actor).getSelectedIndex());
 			}
@@ -367,7 +369,7 @@ public class MenuScreen extends AbstractGameScreen
 	}
 
 	//builds a table that contains the debug settings.
-	private Table buildOptWinDebug () 
+	private Table buildOptWinDebug ()
 	{
 		Table tbl = new Table();
 
@@ -411,10 +413,10 @@ public class MenuScreen extends AbstractGameScreen
 		// + Save Button with event handler
 		btnWinOptSave = new TextButton("Save", skinLibgdx);
 		tbl.add(btnWinOptSave).padRight(30);
-		btnWinOptSave.addListener(new ChangeListener() 
+		btnWinOptSave.addListener(new ChangeListener()
 		{
 			@Override
-			public void changed (ChangeEvent event, Actor actor) 
+			public void changed (ChangeEvent event, Actor actor)
 			{
 				onSaveClicked();
 			}
@@ -423,24 +425,36 @@ public class MenuScreen extends AbstractGameScreen
 		// + Cancel Button with event handler
 		btnWinOptCancel = new TextButton("Cancel", skinLibgdx);
 		tbl.add(btnWinOptCancel);
-		btnWinOptCancel.addListener(new ChangeListener() 
+		btnWinOptCancel.addListener(new ChangeListener()
 		{
 			@Override
-			public void changed (ChangeEvent event, Actor actor) 
+			public void changed (ChangeEvent event, Actor actor)
 			{
 				onCancelClicked();
 			}
 		});
-		return tbl;
 
+		// + High Score with event handler
+		btnHighScore = new TextButton("HighScore", skinLibgdx);
+		tbl.add(btnHighScore);
+		btnHighScore.addListener(new ChangeListener()
+		{
+			@Override
+			public void changed (ChangeEvent event, Actor actor)
+			{
+				onHighScoreClicked();
+			}
+		});
+		return tbl;
 	}
 
+
 	/**
-	 * used to translate back and forth between the values stored in the widgets 
-	 * and the instance of the GamePreferences class. 
+	 * used to translate back and forth between the values stored in the widgets
+	 * and the instance of the GamePreferences class.
 	 * for load() and save()
 	 */
-	private void loadSettings() 
+	private void loadSettings()
 	{
 		GamePreferences prefs = GamePreferences.instance;
 		prefs.load();
@@ -452,7 +466,7 @@ public class MenuScreen extends AbstractGameScreen
 		onCharSkinSelected(prefs.charSkin);
 		chkShowFpsCounter.setChecked(prefs.showFpsCounter);
 	}
-	private void saveSettings() 
+	private void saveSettings()
 	{
 		GamePreferences prefs = GamePreferences.instance;
 		prefs.sound = chkSound.isChecked();
@@ -467,7 +481,7 @@ public class MenuScreen extends AbstractGameScreen
 	/**
 	 * when the mouse is clicked it should set the screen (game screen)
 	 */
-	private void onPlayClicked () 
+	private void onPlayClicked ()
 	{
 		game.setScreen(new GameScreen(game));
 	}
@@ -475,7 +489,7 @@ public class MenuScreen extends AbstractGameScreen
 	/**
 	 * allows the Options window to be opened,, setting loaded first
 	 */
-	private void onOptionsClicked () 
+	private void onOptionsClicked ()
 	{
 		loadSettings();
 		showMenuButtons(false);
@@ -485,15 +499,15 @@ public class MenuScreen extends AbstractGameScreen
 	/**
 	 * will update the preview image
 	 */
-	private void onCharSkinSelected(int index) 
+	private void onCharSkinSelected(int index)
 	{
 		CharacterSkin skin = CharacterSkin.values()[index];
 		imgCharSkin.setColor(skin.getColor());
 	}
-	/**saves the current settings of the Options window 
+	/**saves the current settings of the Options window
 	 * and swaps the Options to menu controls
 	 */
-	private void onSaveClicked() 
+	private void onSaveClicked()
 	{
 		saveSettings();
 		onCancelClicked();
@@ -515,11 +529,14 @@ public class MenuScreen extends AbstractGameScreen
 	}
 
 	/**
-	 * to control whether
-	 * to show or hide the menu buttons
-	 * @param visible
+	 * High score clicked 
 	 */
-	private void showMenuButtons (boolean visible) 
+	private void onHighScoreClicked()
+	{
+		game.setScreen(new HighScoreScreen(game,score));
+	}
+
+	private void showMenuButtons (boolean visible)
 	{
 		float moveDuration = 1.0f;
 		Interpolation moveEasing = Interpolation.swing;
@@ -527,41 +544,31 @@ public class MenuScreen extends AbstractGameScreen
 		float moveX = 300 * (visible ? -1 : 1);
 		float moveY = 0 * (visible ? -1 : 1);
 		final Touchable touchEnabled = visible ? Touchable.enabled: Touchable.disabled;
+
 		btnMenuPlay.addAction(
 				moveBy(moveX, moveY, moveDuration, moveEasing));
-		
 		btnMenuOptions.addAction(sequence(
 				delay(delayOptionsButton),
 				moveBy(moveX, moveY, moveDuration, moveEasing)));
 		SequenceAction seq = sequence();
-		
+
 		if (visible)
 			seq.addAction(delay(delayOptionsButton + moveDuration));
-		
-		seq.addAction(run(new Runnable() 
+		seq.addAction(run(new Runnable()
 		{
-			public void run () {
+			public void run ()
+			{
 				btnMenuPlay.setTouchable(touchEnabled);
 				btnMenuOptions.setTouchable(touchEnabled);
 			}
 		}));
 		stage.addAction(seq);
 	}
-	
-	/**
-	 * animates the options menu in the same way as
-	 * described for the menu buttons in showMenuButtons(). the diff is that it can 
-	 * be skipped.
-	 * @param visible
-	 * @param animated
-	 */
-	private void showOptionsWindow (boolean visible, boolean animated)
+	private void showOptionsWindow (boolean visible,boolean animated)
 	{
 		float alphaTo = visible ? 0.8f : 0.0f;
 		float duration = animated ? 1.0f : 0.0f;
 		Touchable touchEnabled = visible ? Touchable.enabled: Touchable.disabled;
-		winOptions.addAction(sequence(
-				touchable(touchEnabled),
-				alpha(alphaTo, duration)));
+		winOptions.addAction(sequence(touchable(touchEnabled),alpha(alphaTo, duration)));
 	}
 }

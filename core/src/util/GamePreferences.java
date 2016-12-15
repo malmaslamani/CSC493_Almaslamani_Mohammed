@@ -15,6 +15,11 @@ public class GamePreferences
 	public float volMusic;
 	public int charSkin;
 	public boolean showFpsCounter;
+    public int highscore1;
+    public int highscore2;
+    public int highscore3;
+    public int highscore4;
+    
 	private Preferences prefs;
 
 	// singleton: prevent instantiation from other classes
@@ -28,11 +33,19 @@ public class GamePreferences
 	{
 		sound = prefs.getBoolean("sound", true);
 		music = prefs.getBoolean("music", true);
+		
 		//will return a value of 0.5f if there is no value found for the key named volSound.
 		//clamp will ensure that the value is within the allowed range of values 0.0f and 1.0f
 		volSound = MathUtils.clamp(prefs.getFloat("volSound", 0.5f),0.0f, 1.0f);
 		volMusic = MathUtils.clamp(prefs.getFloat("volMusic", 0.5f),0.0f, 1.0f);
 		charSkin = MathUtils.clamp(prefs.getInteger("charSkin", 0),0, 2);
+		
+		//high score holders
+        highscore1 = prefs.getInteger("highScore1");
+        highscore2 = prefs.getInteger("highScore2");
+        highscore3 = prefs.getInteger("highScore3");
+        highscore4 = prefs.getInteger("highScore4");
+
 		showFpsCounter = prefs.getBoolean("showFpsCounter", false);
 	}
 	
@@ -45,6 +58,10 @@ public class GamePreferences
 		prefs.putFloat("volSound", volSound);
 		prefs.putFloat("volMusic", volMusic);
 		prefs.putInteger("charSkin", charSkin);
+        prefs.putInteger("highScore1", highscore1);
+        prefs.putInteger("highScore2", highscore2);
+        prefs.putInteger("highScore3", highscore3);
+        prefs.putInteger("highScore4", highscore4);
 		prefs.putBoolean("showFpsCounter", showFpsCounter);
 		prefs.flush();
 	}

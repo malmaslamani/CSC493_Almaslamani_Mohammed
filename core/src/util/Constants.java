@@ -19,6 +19,9 @@ public class Constants
 
 	// Location of image file for level 01
 	public static final String LEVEL_01 = "levels/level-01.png";
+	
+	// Location of image file for level 02
+	public static final String LEVEL_02 = "levels/level-02.png";
 
 	// Amount of extra lives at level start
 	public static final int LIVES_START = 3;
@@ -39,9 +42,14 @@ public class Constants
 	public static final String SKIN_CANYONBUNNY_UI = "images/monkeyLula-ui.json";
 
 	public static final String PREFERENCES = "canyonbunny.prefs";
+	
+	// Number of carrots to spawn
+	public static final int CARROTS_SPAWN_MAX = 100;
+	// Spawn radius for carrots
+	public static final float CARROTS_SPAWN_RADIUS = 3.5f;
+	// Delay after game finished
+	public static final float TIME_DELAY_GAME_FINISHED = 6;
 
-	public static final int BLOCKS_SPAWN_MAX = 1;
-
-	public static final float BLOCKS_SPAWN_RADIUS = 1.5f;
+	
 
 }

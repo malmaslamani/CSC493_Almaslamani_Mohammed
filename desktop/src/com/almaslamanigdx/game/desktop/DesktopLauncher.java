@@ -8,14 +8,14 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings;
 
 
 
-public class DesktopLauncher 
+public class DesktopLauncher
 {
 	public static boolean rebuildAtlas = false;
 	public static boolean drawDebugOutline = false;
 
-	public static void main (String[] arg) 
+	public static void main (String[] arg)
 	{
-		if (rebuildAtlas) 
+		if (rebuildAtlas)
 		{
 			Settings settings = new Settings();
 			settings.maxWidth = 1024;

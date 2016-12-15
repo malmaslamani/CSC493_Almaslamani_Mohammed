@@ -8,16 +8,14 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.utils.Array;
-
 import util.Constants;
-
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 //to use our new inner classes
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.utils.Array;
 
 public class Assets implements Disposable, AssetErrorListener
 {
@@ -32,9 +30,9 @@ public class Assets implements Disposable, AssetErrorListener
 	public AssetFonts fonts;
 	public AssetSounds sounds;
 	public AssetMusic music;
-
+	
 	/**
-	 * Singleton: prevent instantiation from other classes 
+	 * Singleton: prevent instantiation from other classes
 	 */
 	private Assets()
 	{
@@ -45,7 +43,7 @@ public class Assets implements Disposable, AssetErrorListener
 	 * this method will load all the assets
 	 * @param assetManager
 	 */
-	public void init (AssetManager assetManager) 
+	public void init (AssetManager assetManager)
 	{
 		this.assetManager = assetManager;
 
@@ -54,14 +52,14 @@ public class Assets implements Disposable, AssetErrorListener
 
 		// load texture atlas
 		assetManager.load(Constants.TEXTURE_ATLAS_OBJECTS,TextureAtlas.class);
-		
+
 		// load sounds
 		assetManager.load("sounds/jump.wav", Sound.class);
 		assetManager.load("sounds/jump_with_pineapple.wav", Sound.class);
 		assetManager.load("sounds/eatBanana.wav", Sound.class);
 		assetManager.load("sounds/eatBanana.wav", Sound.class);
 		assetManager.load("sounds/live_lost.wav", Sound.class);
-		
+
 		// load music
 		assetManager.load("music/HungerGames.mp3",Music.class);
 
@@ -80,7 +78,7 @@ public class Assets implements Disposable, AssetErrorListener
 		TextureAtlas atlas = assetManager.get(Constants.TEXTURE_ATLAS_OBJECTS);
 
 		// enable texture filtering for pixel smoothing
-		for (Texture t : atlas.getTextures()) 
+		for (Texture t : atlas.getTextures())
 		{
 			t.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		}
@@ -92,7 +90,7 @@ public class Assets implements Disposable, AssetErrorListener
 		banana = new AssetBanana(atlas);
 		pineApple = new AssetPineApple(atlas);
 		rock = new AssetRock(atlas);
-		
+
 		//tell the asset manager to load and manage every sound and music file
 		sounds = new AssetSounds(assetManager);
 		music = new AssetMusic(assetManager);
@@ -100,7 +98,7 @@ public class Assets implements Disposable, AssetErrorListener
 
 
 	@Override
-	public void dispose() 
+	public void dispose()
 	{
 		assetManager.dispose();
 		fonts.defaultSmall.dispose();
@@ -109,7 +107,7 @@ public class Assets implements Disposable, AssetErrorListener
 	}
 
 	@Override
-	public void error(AssetDescriptor asset, Throwable throwable) 
+	public void error(AssetDescriptor asset, Throwable throwable)
 	{
 		Gdx.app.error(TAG, "Couldn't load asset '" +asset.fileName + "'", (Exception)throwable);
 	}
@@ -118,55 +116,53 @@ public class Assets implements Disposable, AssetErrorListener
 
 	/**
 	 * The constructor takes a reference of the corresponding atlas in which
-	 * it will find the atlas region it wants. 
+	 * it will find the atlas region it wants.
 	 * this class contains monkey asset
 	 */
 	public class AssetMonkey
 	{
 		public final AtlasRegion monkey;
-		
 		public final Animation animNormal;
 		public final Animation animCopterTransform;
 		public final Animation animCopterTransformBack;
 		public final Animation animCopterRotate;
-		
-		public AssetMonkey (TextureAtlas atlas) 
+		public AssetMonkey (TextureAtlas atlas)
 		{
 			monkey = atlas.findRegion("monkey");
-			
+
 			Array<AtlasRegion> regions = null;
 			AtlasRegion region = null;
-			
-			// Animation: Bunny Normal
+
+			// Animation: normal monkey
 			regions = atlas.findRegions("anim_bunny_normal");
 			animNormal = new Animation(1.0f / 10.0f, regions,
-			Animation.PlayMode.LOOP_PINGPONG);
-		
-			// Animation: Bunny Copter - knot ears
+					Animation.PlayMode.LOOP_PINGPONG);
+
+			// Animation: running monkey
 			regions = atlas.findRegions("anim_bunny_copter");
-			animCopterTransform = new Animation(1.0f / 10.0f, regions);
-			
-			// Animation: Bunny Copter - unknot ears
-			regions = atlas.findRegions("anim_bunny_copter");
-			animCopterTransformBack = new Animation(1.0f / 10.0f, regions,
+			 animCopterTransform = new Animation(1.0f / 10.0f, regions);
+
+			 // Animation:
+			 regions = atlas.findRegions("anim_bunny_copter");
+			 animCopterTransformBack = new Animation(1.0f / 10.0f, regions,
 			Animation.PlayMode.REVERSED);
-			
-			// Animation: Bunny Copter - rotate ears
-			regions = new Array<AtlasRegion>();
-			regions.add(atlas.findRegion("anim_bunny_copter", 4));
-			regions.add(atlas.findRegion("anim_bunny_copter", 5));
-			animCopterRotate = new Animation(1.0f / 15.0f, regions);
+
+			 // Animation:
+			 regions = new Array<AtlasRegion>();
+			 regions.add(atlas.findRegion("anim_bunny_copter", 4));
+			 regions.add(atlas.findRegion("anim_bunny_copter", 5));
+			 animCopterRotate = new Animation(1.0f / 15.0f, regions);
 		}
 	}
 
 	/**
 	 * this class contains rock assets
 	 */
-	public class AssetRock 
+	public class AssetRock
 	{
 		public final AtlasRegion edge;
 		public final AtlasRegion middle;
-		public AssetRock (TextureAtlas atlas) 
+		public AssetRock (TextureAtlas atlas)
 		{
 			edge = atlas.findRegion("SmallRock");
 			middle = atlas.findRegion("MediumRock");
@@ -179,7 +175,7 @@ public class Assets implements Disposable, AssetErrorListener
 	public class AssetBanana
 	{
 		public final AtlasRegion banana;
-		public AssetBanana (TextureAtlas atlas) 
+		public AssetBanana (TextureAtlas atlas)
 		{
 			banana = atlas.findRegion("banana");
 		}
@@ -191,7 +187,7 @@ public class Assets implements Disposable, AssetErrorListener
 	public class AssetPineApple
 	{
 		public final AtlasRegion pineApple;
-		public AssetPineApple (TextureAtlas atlas) 
+		public AssetPineApple (TextureAtlas atlas)
 		{
 			pineApple = atlas.findRegion("pineApple");
 		}
@@ -209,6 +205,9 @@ public class Assets implements Disposable, AssetErrorListener
 		public final AtlasRegion mountainLeft;
 		public final AtlasRegion mountainRight;
 		public final AtlasRegion waterOverlay;
+		public final AtlasRegion bananaGoal;
+		public final AtlasRegion goal;
+
 
 		public AssetLevelDecoration (TextureAtlas atlas)
 		{
@@ -218,15 +217,17 @@ public class Assets implements Disposable, AssetErrorListener
 			mountainLeft = atlas.findRegion("mountain_left");
 			mountainRight = atlas.findRegion("mountain_right");
 			waterOverlay = atlas.findRegion("water_overlay");
+			bananaGoal = atlas.findRegion("bananaGoal");
+			goal = atlas.findRegion("goal");
 		}
 	}
 
-	public class AssetFonts 
+	public class AssetFonts
 	{
 		public final BitmapFont defaultSmall;
 		public final BitmapFont defaultNormal;
 		public final BitmapFont defaultBig;
-		public AssetFonts () 
+		public AssetFonts ()
 		{
 
 			// create three fonts using Libgdx's 15px bitmap font
@@ -255,14 +256,14 @@ public class Assets implements Disposable, AssetErrorListener
 	/**
 	 * will hold the loaded instances of sound effects
 	 */
-	public class AssetSounds 
+	public class AssetSounds
 	{
 		public final Sound jump;
 		public final Sound jumpWithPineapple;
 		public final Sound eatBanana;
 		public final Sound eatPineapple;
 		public final Sound liveLost;
-		public AssetSounds (AssetManager am) 
+		public AssetSounds (AssetManager am)
 		{
 			jump = am.get("sounds/jump.wav", Sound.class);
 			jumpWithPineapple = am.get("sounds/jump_with_pineapple.wav",Sound.class);
@@ -274,10 +275,10 @@ public class Assets implements Disposable, AssetErrorListener
 
 	/**will hold the loaded instances of the music effects
 	 */
-	public class AssetMusic 
+	public class AssetMusic
 	{
 		public final Music song01;
-		public AssetMusic (AssetManager am) 
+		public AssetMusic (AssetManager am)
 		{
 			song01 = am.get("music/HungerGames.mp3",Music.class);
 		}
